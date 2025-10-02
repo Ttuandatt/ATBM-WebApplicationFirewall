@@ -1,0 +1,36 @@
+RuleForge/
+├─ backend/                       # Flask backend + admin API + existing waf/backend
+│  ├─ venv/                       # (tùy, local virtualenv)
+│  ├─ backend_app.py              # (bạn có sẵn) demo app (port 5001)
+│  ├─ waf.py                      # (bạn có sẵn) WAF proxy (port 5000)
+│  ├─ admin_api.py                # Flask API để UI gọi (new)
+│  ├─ analyzer.py                 # (bạn có sẵn) analyzer script (run manually or via admin_api)
+│  ├─ utils.py                    # (bạn có sẵn)
+│  ├─ rules.json
+│  ├─ logs/
+│  │  └─ waf.log
+│  ├─ requirements.txt
+│  └─ README-backend.md
+│
+├─ frontend/                      # React + Vite UI
+│  ├─ node_modules/
+│  ├─ index.html
+│  ├─ package.json
+│  ├─ vite.config.js
+│  ├─ src/
+│  │  ├─ main.jsx
+│  │  ├─ App.jsx
+│  │  ├─ components/
+│  │  │  ├─ RuleList.jsx
+│  │  │  ├─ LogsView.jsx
+│  │  │  └─ AnalyzerPanel.jsx
+│  │  └─ styles.css
+│  └─ README-frontend.md
+├─ admin-ui/
+│  ├─ index.html
+│  ├─ style.css
+│  └─ script.js
+├─ README.md
+└─ note.txt
+
+

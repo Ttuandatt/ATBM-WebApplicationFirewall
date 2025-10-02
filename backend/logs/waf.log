@@ -1,0 +1,57 @@
+2025-10-02 17:33:32,984 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-02 17:33:32,984 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-02 17:33:32,985 [INFO]  * Restarting with stat
+2025-10-02 17:33:33,192 [WARNING]  * Debugger is active!
+2025-10-02 17:33:33,194 [INFO]  * Debugger PIN: 735-192-250
+2025-10-02 17:34:05,070 [INFO] ALLOWED: 127.0.0.1 /? 
+2025-10-02 17:34:07,104 [INFO] ALLOWED: 127.0.0.1 /? 
+2025-10-02 17:34:09,188 [INFO] 127.0.0.1 - - [02/Oct/2025 17:34:09] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-10-02 17:50:55,809 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-02 17:50:55,809 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-02 17:50:55,810 [INFO]  * Restarting with stat
+2025-10-02 17:50:56,217 [WARNING]  * Debugger is active!
+2025-10-02 17:50:56,219 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 17:53:32,041 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 17:53:32,127 [INFO]  * Restarting with stat
+2025-10-02 17:53:32,753 [WARNING]  * Debugger is active!
+2025-10-02 17:53:32,754 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 17:55:15,272 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 17:55:15,311 [INFO]  * Restarting with stat
+2025-10-02 17:55:15,827 [WARNING]  * Debugger is active!
+2025-10-02 17:55:15,829 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 17:55:50,597 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-02 17:55:50,597 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-02 17:55:50,598 [INFO]  * Restarting with stat
+2025-10-02 17:55:50,993 [WARNING]  * Debugger is active!
+2025-10-02 17:55:50,994 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 17:57:35,037 [INFO] ALLOWED: 127.0.0.1 /? 
+2025-10-02 17:57:37,098 [INFO] 127.0.0.1 - - [02/Oct/2025 17:57:37] "GET / HTTP/1.1" 200 -
+2025-10-02 17:57:37,181 [INFO] ALLOWED: 127.0.0.1 /favicon.ico? 
+2025-10-02 17:57:39,234 [INFO] 127.0.0.1 - - [02/Oct/2025 17:57:39] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-02 18:03:47,683 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:03:47,731 [INFO]  * Restarting with stat
+2025-10-02 18:03:48,187 [WARNING]  * Debugger is active!
+2025-10-02 18:03:48,188 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 18:03:52,212 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:03:52,242 [INFO]  * Restarting with stat
+2025-10-02 18:03:52,762 [WARNING]  * Debugger is active!
+2025-10-02 18:03:52,763 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 18:03:55,780 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:03:55,807 [INFO]  * Restarting with stat
+2025-10-02 18:03:56,353 [WARNING]  * Debugger is active!
+2025-10-02 18:03:56,354 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 18:05:57,983 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:05:58,011 [INFO]  * Restarting with stat
+2025-10-02 18:05:58,484 [WARNING]  * Debugger is active!
+2025-10-02 18:05:58,485 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 18:09:02,464 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:09:02,571 [INFO]  * Restarting with stat
+2025-10-02 18:09:03,027 [WARNING]  * Debugger is active!
+2025-10-02 18:09:03,029 [INFO]  * Debugger PIN: 253-374-819
+2025-10-02 18:09:10,059 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-02 18:09:10,093 [INFO]  * Restarting with stat
+2025-10-02 18:09:10,532 [WARNING]  * Debugger is active!
+2025-10-02 18:09:10,534 [INFO]  * Debugger PIN: 253-374-819

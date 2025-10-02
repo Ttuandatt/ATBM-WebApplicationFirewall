@@ -1,0 +1,4 @@
+[
+  { "id": 1, "type": "regex", "pattern": "(<script>.*?</script>)", "enabled": true, "source": "seed" },
+  { "id": 2, "type": "regex", "pattern": "(UNION.*SELECT.*FROM)", "enabled": true, "source": "seed" }
+]
