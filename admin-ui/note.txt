@@ -1,0 +1,4 @@
+Admin-UI (HTML demo dashboard)
+Cách server (đề xuất): chạy trong thư mục admin-ui/:
+
+python -m http.server 8080
