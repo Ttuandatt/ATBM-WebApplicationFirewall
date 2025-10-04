@@ -236,36 +236,114 @@ curl "http://127.0.0.1:5002/api/logs"
 
 ### 2) Scenario B — Vi phạm match rule (bị block)
 
-Mục tiêu: gửi payload khớp rule (<script>.*?</script>) trong rules.json → WAF phải chặn (403) và ghi log BLOCKED.
+**Mục tiêu**: Mô phỏng các request chứa payload tấn công (trùng với regex rule trong rules.json) →
+WAF phải phát hiện, chặn (HTTP 403), ghi log BLOCKED, và không forward tới backend.
 
-Dùng curl (POST với body có <script>)
+### ⚔️ 1. Cross-Site Scripting (XSS Attack)
+
+Mô phỏng hành vi:
+
+Kẻ tấn công cố gắng chèn thẻ <script> vào nội dung người dùng gửi (form bình luận, ô tìm kiếm, v.v.).
+Mục tiêu là khiến trình duyệt nạn nhân thực thi JavaScript độc hại.
+
+Rule tương ứng trong rules.json:
+```
+{
+    "id": 1,
+    "type": "XSS",
+    "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Chặn payload XSS dạng <script>...</script>. Dùng để phát hiện script tag trực tiếp trong body/query. (FP risk: thấp nếu đã decode input)."
+  }
+```
+
+Command demo:
+```
 curl -i -X POST "http://127.0.0.1:5000/comment" \
   -H "Content-Type: text/plain" \
   --data "<script>alert('xss-demo')</script>"
+```
 
+Expected (HTTP response):
+```
+HTTP/1.1 403 Forbidden
+Content-Type: text/plain
 
-Expected (HTTP):
+Blocked by RuleForge WAF
+```
 
-Status 403 Forbidden
+Expected log entry (trong backend/logs/waf.log hoặc /api/logs):
+```
+{"timestamp": "...", "src_ip": "127.0.0.1", "path": "/comment", "payload": "<script>alert('xss-demo')</script>", "matched_rule": "(<script>.*?</script>)", "action": "BLOCKED"}
+```
 
-Body: Blocked by RuleForge WAF (hoặc thông báo tương tự trong waf.py)
+### 🧨 2. SQL Injection (SQLi Attack)
 
-Dùng curl (GET với raw query — có thể cần encode behavior)
+Mô phỏng hành vi:
+Kẻ tấn công chèn câu lệnh SQL vào input để trích xuất dữ liệu từ database (như users hoặc passwords).
 
-Trường hợp bạn muốn thử GET (nhiều browser auto-encode so query) — để chắc chắn dùng:
+Rule tương ứng trong rules.json:
+```
+{
+    "id": 3,
+    "type": "SQLi",
+    "pattern": "(?:union\\s+select\\b)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Phát hiện pattern 'UNION SELECT' – chỉ dùng khi normalized và case-insensitive. Rất hiệu quả với SQLi dạng union-based."
+  }
+```
 
-# gửi raw query bằng curl (shell-escaping)
-curl -i "http://127.0.0.1:5000/search?q=<script>alert(1)</script>"
+Command demo:
+```
+curl -i "http://127.0.0.1:5000/search?q=1 UNION SELECT username,password FROM users"
+```
 
+Expected (HTTP response):
+```
+HTTP/1.1 403 Forbidden
+Content-Type: text/plain
 
-Nếu shell/terminal encode, dùng POST body cách trên là an toàn và đảm bảo match.
+Blocked by RuleForge WAF
+```
 
-Kiểm tra log
-# xem các dòng cuối
-tail -n 30 backend/logs/waf.log
+Expected log entry:
+```
+{"timestamp": "...", "src_ip": "127.0.0.1", "path": "/search", "payload": "1 UNION SELECT username,password FROM users", "matched_rule": "(UNION.*SELECT.*FROM)", "action": "BLOCKED"}
+```
 
-# hoặc admin API
-curl "http://127.0.0.1:5002/api/logs"
+### 🧱 3. Command Injection (CMD Injection)
 
+Mô phỏng hành vi:
+Kẻ tấn công cố gắng chèn lệnh hệ thống (;, &&, |, v.v.) vào input — ví dụ khi backend gọi os.system() hoặc subprocess.
 
-Expected log entry: sẽ có một dòng chứa BLOCKED: <src_ip> /comment?... <script>... — tùy format bạn dùng logging.warning(f"BLOCKED: ...") trong waf.py. Nếu bạn đã đổi sang JSON logs, sẽ thấy trường matched_rule hoặc tương tự.
+Rule tương ứng trong rules.json:
+```
+{
+  "id": 3,
+  "type": "regex",
+  "pattern": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)",
+  "enabled": true,
+  "source": "seed",
+  "comment": "Phát hiện Command Injection — khi người dùng cố gắng thực thi lệnh hệ thống."
+}
+```
+
+Command demo:
+```
+curl -i "http://127.0.0.1:5000/search?q=iphone;ls"
+```
+
+Expected (HTTP response):
+```
+HTTP/1.1 403 Forbidden
+Content-Type: text/plain
+
+Blocked by RuleForge WAF
+```
+
+Expected log entry:
+```
+{"timestamp": "...", "src_ip": "127.0.0.1", "path": "/search", "payload": "iphone;ls", "matched_rule": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)", "action": "BLOCKED"}
+```
