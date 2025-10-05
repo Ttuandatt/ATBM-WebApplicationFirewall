@@ -1,0 +1,94 @@
+       ┌───────────────┐
+       │     User      │
+       │ (trình duyệt) │
+       └───────┬───────┘
+               │ HTTP Request
+               ▼
+        ┌───────────────┐
+        │     WAF       │
+        │   (waf.py)    │
+        └───────┬───────┘
+     - Nếu match rule trong rules.json → block (403) và log lại vào logs/waf.log.
+     - Nếu không match → forward đến backend_app.py (port 5001).
+
+                │
+                ▼
+         ┌───────────────┐
+         │ Demo Backend  │
+         │ (backend_app) │
+         └───────────────┘
+                │
+                ▼
+        ┌───────────────┐
+        │   Response    │
+        └───────────────┘
+
+
+   ┌───────────────────────────────────────────────────────────┐
+   │                    Admin Side (port 5002)                 │
+   │                                                           │
+   │   ┌───────────────┐       ┌───────────────┐               │
+   │   │   Admin UI    │◀─────▶│  Admin API    │               │
+   │   │ (React/HTML)  │       │ (admin_api.py)│               │
+   │   └───────────────┘       └───────┬───────┘               │
+   │                                   │                       │
+   │     GET/POST /rules               │  POST /analyze        │
+   │     GET /logs                     ▼                       │
+   │                              ┌───────────────┐            │
+   │                              │   Analyzer    │            │
+   │                              │ (analyzer.py) │            │
+   │                              └───────┬───────┘            │
+   │                                      │                    │
+   │                                 Update rules.json         │
+   │                                 (tự động sinh regex)      │
+   └───────────────────────────────────────────────────────────┘
+
+🔑 Giải thích flow:
+
+1. User gửi request → đi qua waf.py.
+- Nếu match rule trong rules.json → block (403) và log lại.
+- Nếu không match → forward đến backend_app.py (port 5001).
+
+2. WAF log lưu vào logs/waf.log.
+
+3. Admin API (5002) cho Admin UI gọi:
+- /rules: xem / thêm / xóa rule.
+- /logs: xem log mới nhất.
+- /analyze: trigger analyzer đọc log và cập nhật rules.json.
+
+4. Analyzer.py đọc log, tìm pattern tấn công → sinh regex rule mới → append vào rules.json.
+
+
+
+
+--------------------------------------
+Cách chạy (local, trong PyCharm)
+
+Backend
+
+1. Tạo virtualenv và cài dependency (ví dụ trong backend/):
+
+python -m venv venv
+venv\Scripts\activate -> kích hoạt vào chế độ virtual environment (venv) của Python. Thoát venv: deactivate
+pip install -r requirements.txt
+# nếu bạn chưa có, requirements.txt ví dụ:
+# flask
+# flask-cors
+
+
+2. Chạy admin_api.py:
+
+python admin_api.py
+
+=> Admin API lắng nghe http://127.0.0.1:5002.
+
+
+3. Chạy backend_app.py (port 5001) và waf.py (port 5000) như bạn đã có:
+
+python backend_app.py
+python waf.py
+
+
+Trong PyCharm:
+
+Bạn có thể tạo 2 (hoặc 3) Run Configurations kiểu "Python" để chạy backend_app.py, waf.py, admin_api.py. PyCharm tích hợp virtualenv; chọn interpreter là venv của project. Chạy từng config trong các tab run khác nhau.

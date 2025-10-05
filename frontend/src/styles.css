@@ -1,0 +1,18 @@
+:root{ --bg:#f7f8fb; --card:#fff; --accent:#0b66ff }
+body{ font-family: Inter, system-ui, Arial; background:var(--bg); margin:0; padding:20px; color:#111 }
+.container{ max-width:1100px; margin:0 auto }
+header{ margin-bottom:12px }
+.tagline{ color:#666; margin-top:0 }
+main{ display:flex; gap:16px }
+.left{ flex:1 }
+.right{ flex:1 }
+.card{ background:var(--card); padding:12px; border-radius:8px; box-shadow:0 1px 6px rgba(0,0,0,0.06); margin-bottom:12px }
+.rule-table{ width:100%; border-collapse:collapse; font-size:13px }
+.rule-table th, .rule-table td{ padding:6px 8px; border-bottom:1px solid #eee; text-align:left }
+.mono{ font-family: monospace; font-size:12px }
+.logs{ max-height:480px; overflow:auto }
+.log-line{ padding:8px; border-bottom:1px dashed #eee }
+.small{ font-size:12px; color:#444 }
+.output{ background:#111; color:#dff; padding:8px; max-height:220px; overflow:auto; border-radius:6px }
+button{ background:var(--accent); color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer }
+button:disabled{ opacity:0.6; cursor:default }
