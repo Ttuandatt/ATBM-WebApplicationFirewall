@@ -33,7 +33,7 @@ def get_logs():
     return jsonify({"logs": lines})
 
 
-@app.route("/api/analyze", methods=["POST"])
+@app.route("/api/analyze", methods=["GET"])
 def run_analyzer():
     """Chạy analyzer.py để sinh rules mới"""
     try:
