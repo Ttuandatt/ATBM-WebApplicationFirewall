@@ -174,3 +174,13 @@
 2025-10-10 12:57:12,231 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /search?q=%3cscript%3ealert%281%29%3c%2fscript%3e
 2025-10-10 12:57:12,231 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
 2025-10-10 12:57:12,231 [INFO] 127.0.0.1 - - [10/Oct/2025 12:57:12] "[31m[1mGET /search?q=<script>alert(1)</script> HTTP/1.1[0m" 403 -
+2025-10-10 14:53:38,515 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-10 14:53:38,516 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-10 14:53:38,517 [INFO]  * Restarting with stat
+2025-10-10 14:53:38,943 [WARNING]  * Debugger is active!
+2025-10-10 14:53:38,945 [INFO]  * Debugger PIN: 253-374-819
+2025-10-10 15:00:43,958 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-10 15:00:43,995 [INFO]  * Restarting with stat
+2025-10-10 15:00:44,490 [WARNING]  * Debugger is active!
+2025-10-10 15:00:44,492 [INFO]  * Debugger PIN: 253-374-819

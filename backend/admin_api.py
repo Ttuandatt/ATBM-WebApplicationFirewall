@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS   # thêm dòng này
+from flask_cors import CORS
 import subprocess
 import json
 import os
 
 app = Flask(__name__)
-CORS(app)  # Cho phép tất cả origin gọi API
+CORS(app)  # Cho phép gọi API từ admin-ui
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RULES_FILE = os.path.join(BASE_DIR, "rules.json")
@@ -30,12 +30,17 @@ def get_logs():
         return jsonify({"error": "waf.log not found"}), 404
     with open(LOG_FILE, "r", encoding="utf-8") as f:
         lines = f.readlines()
+    # Giới hạn số dòng log hiển thị (vd: 100 dòng gần nhất)
+    lines = lines[-100:]
     return jsonify({"logs": lines})
 
 
-@app.route("/api/analyze", methods=["GET"])
+@app.route("/api/analyze", methods=["GET", "POST"])
 def run_analyzer():
-    """Chạy analyzer.py để sinh rules mới"""
+    """
+    Chạy analyzer.py để sinh rules mới hoặc phân tích log.
+    Gọi bằng POST (từ frontend) hoặc GET (thử nghiệm thủ công).
+    """
     try:
         result = subprocess.run(
             ["python", ANALYZER_FILE],
@@ -44,10 +49,27 @@ def run_analyzer():
             text=True
         )
         if result.returncode != 0:
-            return jsonify({"error": "Analyzer failed", "details": result.stderr}), 500
-        return jsonify({"message": "Analyzer executed", "output": result.stdout})
+            return jsonify({
+                "error": "Analyzer failed",
+                "details": result.stderr
+            }), 500
+
+        return jsonify({
+            "message": "Analyzer executed successfully",
+            "output": result.stdout
+        }), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/", methods=["GET"])
+def index():
+    """Trang gốc thông báo API hoạt động"""
+    return jsonify({
+        "message": "RuleForge Admin API is running",
+        "endpoints": ["/api/rules", "/api/logs", "/api/analyze"]
+    })
 
 
 if __name__ == "__main__":
