@@ -16,7 +16,7 @@ RuleForge/
 │  ├─ node_modules/
 │  ├─ index.html
 │  ├─ package.json
-│  ├─ vite.config.js
+│  ├─ package-lock.json
 │  ├─ src/
 │  │  ├─ main.jsx
 │  │  ├─ App.jsx
