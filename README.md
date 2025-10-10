@@ -347,3 +347,131 @@ Expected log entry:
 ```
 {"timestamp": "...", "src_ip": "127.0.0.1", "path": "/search", "payload": "iphone;ls", "matched_rule": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)", "action": "BLOCKED"}
 ```
+
+---
+
+# FLASK
+### 🧩 1. Flask là gì?
+
+Flask là một web framework viết bằng Python, dùng để:
+
+- Xây dựng web server (máy chủ web nhỏ gọn)
+
+- Tạo API (Application Programming Interface) — giúp frontend (HTML/JS) giao tiếp với backend
+
+- Xử lý HTTP requests (GET, POST, PUT, DELETE,...)
+
+- Trả về dữ liệu JSON hoặc giao diện HTML
+
+👉 Tóm gọn: Flask giúp Python “nói chuyện” với trình duyệt, và là bộ não điều phối logic backend.
+
+### ⚙️ 2. Flask hoạt động như thế nào?
+🔁 Chu trình hoạt động cơ bản:
+
+- 1️⃣ Frontend (trình duyệt / HTML) gửi request HTTP đến Flask (ví dụ: GET /api/rules)
+- 2️⃣ Flask nhận request → chạy hàm Python tương ứng (route handler)
+- 3️⃣ Flask xử lý logic: đọc file, chạy script, truy vấn DB,...
+- 4️⃣ Flask trả kết quả (HTML hoặc JSON) về cho frontend
+- 5️⃣ Frontend hiển thị kết quả cho người dùng
+
+### 📘 3. Vai trò của Flask trong project RuleForge
+
+Trong project của ta, Flask (file admin_api.py) đóng vai trò như “API Server” cho trang quản trị RuleForge Admin UI.
+Cụ thể:
+
+|       Thành phần	      |                         Vai trò                             |
+|---------------------------------------------------------------------------------------|
+|  admin_api.py (Flask)   | 	Backend API – đọc dữ liệu rule, log, chạy analyzer      |
+|      admin-ui/	      |   Frontend – giao diện người dùng quản trị hiển thị dữ liệu |
+|      rules.json         |      	Cơ sở dữ liệu rule (mẫu tấn công WAF)               |
+|         waf.log         |     	File lưu log truy cập (ghi lại hành vi bị chặn)     |
+|      analyzer.py        |	      Script tự động phân tích log → tạo rule mới           |
+
+
+### 🌐 4. Luồng hoạt động của hệ thống
+
+Dưới đây là sơ đồ luồng hoạt động tổng thể trong project của bạn:
+
+┌──────────────────────────────┐
+│  Người dùng (Admin UI)       │
+│  → index.html, script.js     │
+└────────────┬─────────────────┘
+             │ ① Gửi request HTTP
+             │   (GET /api/rules, GET /api/logs, GET /api/analyze)
+             ▼
+┌──────────────────────────────┐
+│ Flask server (admin_api.py)  │
+│  - Xử lý API request         │
+│  - Đọc rules.json            │
+│  - Đọc logs/waf.log          │
+│  - Gọi analyzer.py           │
+└────────────┬─────────────────┘
+             │ ② Xử lý logic bằng Python
+             ▼
+┌──────────────────────────────┐
+│  Dữ liệu hệ thống backend    │
+│  - rules.json                │
+│  - logs/waf.log              │
+│  - analyzer.py               │
+└────────────┬─────────────────┘
+             │ ③ Trả kết quả JSON
+             ▼
+┌──────────────────────────────┐
+│  Frontend nhận dữ liệu JSON  │
+│  - script.js xử lý JSON      │
+│  - Render ra bảng HTML       │
+└──────────────────────────────┘
+
+### 🧠 5. Flask trong project RuleForge giúp ích như thế nào?
+|          Mục tiêu          |	                    Flask đảm nhận                            |
+|---------------------------------------------------------------------------------------------|
+|    Xem danh sách rules     |      /api/rules đọc file rules.json, trả về JSON               |
+|    Xem log hoạt động       |	    /api/logs đọc file waf.log, trả về log                    |
+|    Chạy phân tích          |     	/api/analyze gọi analyzer.py sinh rule mới                |
+|  Giao tiếp với giao diện	 |      Cho phép admin-ui (HTML/JS) truy cập dữ liệu qua HTTP     |
+|      Bảo vệ CORS	         | Dùng flask_cors.CORS(app) cho phép frontend khác port truy cập |
+
+
+### 💡 6. Ví dụ cụ thể về hoạt động
+
+Khi ta nhấn nút “Load Rules” trên giao diện:
+
+1️⃣ Giao diện gọi JS:
+
+```
+fetch("http://127.0.0.1:5002/api/rules")
+```
+
+2️⃣ Flask nhận request /api/rules → chạy:
+```
+@app.route("/api/rules", methods=["GET"])
+def get_rules():
+    with open("rules.json") as f:
+        return jsonify(json.load(f))
+```
+
+3️⃣ Flask trả về:
+```
+[
+  {"id": 1, "type": "SQLi", "pattern": "UNION SELECT", "enabled": true}
+]
+```
+
+4️⃣ JavaScript nhận JSON → hiển thị trong <table>.
+
+### 🧩 7. So sánh Flask với các framework khác
+|   Framework	|   Ngôn ngữ   |            Đặc điểm                   |
+|----------------------------------------------------------------------|
+|     Flask	    |    Python    |   Nhẹ, linh hoạt, dễ dùng             |
+|     Django	|    Python    |   Mạnh hơn, có ORM và admin site sẵn  |
+|   Express.js	|   JavaScript |   Giống Flask nhưng chạy trên Node.js |
+|   Spring Boot | 	  Java     |   Cho ứng dụng lớn, enterprise-scale  |
+
+
+### ✅ Kết luận
+
+- Flask = Bộ não backend của RuleForge.
+
+- Nó nhận request từ frontend, xử lý dữ liệu rule & log, và gửi phản hồi lại.
+
+- Nhờ Flask, bta có thể tách biệt frontend (giao diện) và backend (xử lý dữ liệu), tạo ra một hệ thống có cấu trúc rõ ràng, dễ mở rộng.
