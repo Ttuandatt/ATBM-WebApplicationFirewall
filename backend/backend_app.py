@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "<h1>Welcome to RuleForge Demo App</h1><p>Try /search?q= or /login</p>"
+    return "<h1>Welcome to RuleForge Demo App</h1><p>Try /search?q= or /login</p>, or /file?path=</p>"
 
 @app.route("/search")
 def search():
@@ -24,6 +24,13 @@ def login():
             <button type="submit">Login</button>
         </form>
     '''
+@app.route("/file")
+def file_access():
+    path = request.args.get("path", "")
+    if path:
+        return f"<h2>Attempting to access file: {path}</h2>"
+    return "<h2>Please provide a file path using ?path=</h2>"
+
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)

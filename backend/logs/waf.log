@@ -55,3 +55,39 @@
 2025-10-02 18:09:10,093 [INFO]  * Restarting with stat
 2025-10-02 18:09:10,532 [WARNING]  * Debugger is active!
 2025-10-02 18:09:10,534 [INFO]  * Debugger PIN: 253-374-819
+2025-10-09 10:04:30,659 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-09 10:04:30,660 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-09 10:04:30,690 [INFO]  * Restarting with watchdog (windowsapi)
+2025-10-09 10:04:32,331 [WARNING]  * Debugger is active!
+2025-10-09 10:04:32,341 [INFO]  * Debugger PIN: 988-588-192
+2025-10-09 10:07:07,051 [INFO]  * Detected change in 'D:\\Năm 4\\HK1\\An toàn bảo mật thông tin\\DO-AN\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-09 10:07:07,059 [INFO]  * Detected change in 'D:\\Năm 4\\HK1\\An toàn bảo mật thông tin\\DO-AN\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-09 10:07:07,281 [INFO]  * Detected change in 'D:\\Năm 4\\HK1\\An toàn bảo mật thông tin\\DO-AN\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-09 10:07:07,285 [INFO]  * Detected change in 'D:\\Năm 4\\HK1\\An toàn bảo mật thông tin\\DO-AN\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-09 10:07:08,268 [INFO]  * Restarting with watchdog (windowsapi)
+2025-10-09 10:07:13,777 [WARNING]  * Debugger is active!
+2025-10-09 10:07:13,786 [INFO]  * Debugger PIN: 988-588-192
+2025-10-09 10:07:28,131 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\__init__.py', reloading
+2025-10-09 10:07:28,155 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_eventloop.py', reloading
+2025-10-09 10:07:28,198 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_exceptions.py', reloading
+2025-10-09 10:07:28,215 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_fileio.py', reloading
+2025-10-09 10:07:28,314 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\to_thread.py', reloading
+2025-10-09 10:07:28,331 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\__init__.py', reloading
+2025-10-09 10:07:28,344 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_eventloop.py', reloading
+2025-10-09 10:07:28,443 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_resources.py', reloading
+2025-10-09 10:07:28,461 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_sockets.py', reloading
+2025-10-09 10:07:28,507 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_typedattr.py', reloading
+2025-10-09 10:07:28,525 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_streams.py', reloading
+2025-10-09 10:07:28,551 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_tasks.py', reloading
+2025-10-09 10:07:28,582 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_subprocesses.py', reloading
+2025-10-09 10:07:28,598 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\abc\\_testing.py', reloading
+2025-10-09 10:07:28,616 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_synchronization.py', reloading
+2025-10-09 10:07:28,699 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\lowlevel.py', reloading
+2025-10-09 10:07:28,718 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_tasks.py', reloading
+2025-10-09 10:07:28,735 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_testing.py', reloading
+2025-10-09 10:07:28,768 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\from_thread.py', reloading
+2025-10-09 10:07:28,864 [INFO]  * Detected change in 'C:\\ProgramData\\anaconda3\\Lib\\site-packages\\anyio\\_core\\_resources.py', reloading
+2025-10-09 10:07:29,165 [INFO]  * Restarting with watchdog (windowsapi)
+2025-10-09 10:07:35,040 [WARNING]  * Debugger is active!
+2025-10-09 10:07:35,051 [INFO]  * Debugger PIN: 988-588-192
