@@ -92,3 +92,12 @@ python waf.py
 Trong PyCharm:
 
 Bạn có thể tạo 2 (hoặc 3) Run Configurations kiểu "Python" để chạy backend_app.py, waf.py, admin_api.py. PyCharm tích hợp virtualenv; chọn interpreter là venv của project. Chạy từng config trong các tab run khác nhau.
+
+Vy:
+Có bổ sung các quy tắc bên rules.json:
+1. Quy tắc 3: Command Injection (Common Commands)
+2. Quy tắc 4: XSS (Event Handlers and JavaScript URIs)
+3. Quy tắc 5: SQL Injection (Additional Patterns)
+4. Quy tắc 6: Directory Traversal
+5. Quy tắc 7: Command Injection (Advanced Commands)
+6. Quy tắc 8: Malicious User-Agent

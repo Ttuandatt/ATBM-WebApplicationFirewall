@@ -1,4 +1,58 @@
 [
-  { "id": 1, "type": "regex", "pattern": "(<script>.*?</script>)", "enabled": true, "source": "seed" },
-  { "id": 2, "type": "regex", "pattern": "(UNION.*SELECT.*FROM)", "enabled": true, "source": "seed" }
+  {
+    "id": 1,
+    "type": "regex",
+    "pattern": "(<script>.*?</script>)",
+    "enabled": true,
+    "source": "seed"
+  },
+  {
+    "id": 2,
+    "type": "regex",
+    "pattern": "(UNION.*SELECT.*FROM)",
+    "enabled": true,
+    "source": "seed"
+  },
+  {
+    "id": 3,
+    "type": "regex",
+    "pattern": "(ls|cat|rm|whoami|ping|nc|netcat|curl|wget)",
+    "enabled": true,
+    "source": "admin"
+  },
+  {
+    "id": 4,
+    "type": "regex",
+    "pattern": "(onerror|onload|onmouseover|javascript:)",
+    "enabled": true,
+    "source": "admin"
+  },
+  {
+    "id": 5,
+    "type": "regex",
+    "pattern": "(OR\\s+1=1|DROP\\s+TABLE|INSERT\\s+INTO)",
+    "enabled": true,
+    "source": "admin"
+  },
+  {
+    "id": 6,
+    "type": "regex",
+    "pattern": "(\\.\\./|\\.\\.%2F|%2e%2e%2f)",
+    "enabled": true,
+    "source": "admin"
+  },
+  {
+    "id": 7,
+    "type": "regex",
+    "pattern": "(bash|sh|eval|exec|system|passthru)",
+    "enabled": true,
+    "source": "admin"
+  },
+  {
+    "id": 8,
+    "type": "regex",
+    "pattern": "(sqlmap|nikto|burp|nessus|metasploit)",
+    "enabled": true,
+    "source": "admin"
+  }
 ]
