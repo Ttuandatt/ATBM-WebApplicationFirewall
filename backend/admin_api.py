@@ -25,14 +25,13 @@ def get_rules():
 
 @app.route("/api/logs", methods=["GET"])
 def get_logs():
-    """Trả về nội dung log"""
+    """Trả về nội dung log (50 dòng cuối)"""
     if not os.path.exists(LOG_FILE):
-        return jsonify({"error": "waf.log not found"}), 404
+        return jsonify({"error": "Log file not found"}), 404
+
     with open(LOG_FILE, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    # Giới hạn số dòng log hiển thị (vd: 100 dòng gần nhất)
-    lines = lines[-100:]
-    return jsonify({"logs": lines})
+        lines = f.readlines()[-50:]  # lấy 50 dòng cuối
+    return jsonify({"logs": [l.strip() for l in lines]})
 
 
 @app.route("/api/analyze", methods=["GET", "POST"])

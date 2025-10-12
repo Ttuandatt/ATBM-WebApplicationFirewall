@@ -154,3 +154,32 @@ Các pattern mẫu để thử:
     "source": "analyzer",
     "comment": "Phát hiện đoạn mã XSS chứa thẻ <script>."
   }
+
+
+  12/10/2025
+  Đề chạy demo_attacks.ps1, nhập các lệnh:
+- Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+- ./demo_attacks.ps1
+
+[PowerShell Script demo_attacks.ps1]
+        │
+        ▼
+Gửi request thử nghiệm (XSS, SQLi, CRLF...) → http://127.0.0.1:5000
+        │
+        ▼
+ [waf.py]  — Web Application Firewall
+     ├─ Đọc rules.json
+     ├─ Kiểm tra pattern + heuristic
+     ├─ Nếu khớp → BLOCK + ghi log JSON (waf.log)
+     └─ Nếu hợp lệ → chuyển tiếp request tới backend_app.py
+        │
+        ▼
+ [backend_app.py] — Flask demo app (giả lập web bán điện thoại)
+     ├─ /search?q=... → render HTML kết quả
+     └─ /login → nhận form đăng nhập demo
+        │
+        ▼
+ [admin_api.py] — REST API quản trị
+     ├─ /api/rules → xem rule hiện có
+     ├─ /api/analyze → chạy analyzer.py sinh rule tự động
+     └─ /api/logs → đọc waf.log (PowerShell script gọi để xem log)

@@ -190,3 +190,235 @@
 2025-10-12 20:08:05,042 [INFO]  * Restarting with stat
 2025-10-12 20:08:05,477 [WARNING]  * Debugger is active!
 2025-10-12 20:08:05,478 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-12T13:51:24.305418Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 20:51:24,305 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 20:51:26,348 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:26] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T13:51:27.384283Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 20:51:27,384 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 20:51:29,468 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:29] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T13:51:30.490436Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 20:51:30,490 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 20:51:32,549 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:32] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T13:51:33.608311Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 20:51:33,608 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 20:51:35,682 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:35] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 20:51:36,708 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 20:51:36,708 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 20:51:36,708 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:36] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 20:51:37,777 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T13:51:37.777239+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 20:51:37,777 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:37] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T13:51:38.787643Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 20:51:38,787 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 20:51:40,854 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:40] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 20:51:41,889 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 20:51:41,890 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 20:51:41,890 [INFO] 127.0.0.1 - - [12/Oct/2025 20:51:41] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T13:53:45.186562Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 20:53:45,186 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 20:53:47,205 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:47] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T13:53:48.227834Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 20:53:48,228 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 20:53:50,289 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:50] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T13:53:51.325704Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 20:53:51,325 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 20:53:53,379 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:53] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T13:53:54.392252Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 20:53:54,392 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 20:53:56,438 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:56] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 20:53:57,450 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 20:53:57,450 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 20:53:57,450 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:57] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 20:53:58,462 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T13:53:58.462566+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 20:53:58,462 [INFO] 127.0.0.1 - - [12/Oct/2025 20:53:58] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T13:53:59.477516Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 20:53:59,477 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 20:54:01,518 [INFO] 127.0.0.1 - - [12/Oct/2025 20:54:01] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 20:54:02,535 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 20:54:02,535 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 20:54:02,536 [INFO] 127.0.0.1 - - [12/Oct/2025 20:54:02] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T14:11:51.068848Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:11:51,069 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:11:53,127 [INFO] 127.0.0.1 - - [12/Oct/2025 21:11:53] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:12:50.047712Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:12:50,047 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:12:52,105 [INFO] 127.0.0.1 - - [12/Oct/2025 21:12:52] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:12:53.134085Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:12:53,134 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:12:55,170 [INFO] 127.0.0.1 - - [12/Oct/2025 21:12:55] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:12:55.751319Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:12:55,751 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:12:57,816 [INFO] 127.0.0.1 - - [12/Oct/2025 21:12:57] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:12:58.474445Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:12:58,474 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:13:00,507 [INFO] 127.0.0.1 - - [12/Oct/2025 21:13:00] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:13:01.213561Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:13:01,213 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:13:03,273 [INFO] 127.0.0.1 - - [12/Oct/2025 21:13:03] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:14:57.043320Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 21:14:57,043 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 21:14:59,099 [INFO] 127.0.0.1 - - [12/Oct/2025 21:14:59] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T14:15:24.015668Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 21:15:24,015 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 21:15:26,096 [INFO] 127.0.0.1 - - [12/Oct/2025 21:15:26] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T14:15:27.637318Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 21:15:27,637 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 21:15:29,664 [INFO] 127.0.0.1 - - [12/Oct/2025 21:15:29] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T14:17:39.443601Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 21:17:39,443 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 21:17:41,489 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:41] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:17:42.500071Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 21:17:42,500 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 21:17:44,546 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:44] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T14:17:45.559123Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 21:17:45,559 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 21:17:47,624 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:47] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T14:17:48.631758Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 21:17:48,631 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 21:17:50,673 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:50] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 21:17:51,687 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 21:17:51,688 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 21:17:51,688 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:51] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 21:17:52,693 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T14:17:52.693431+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 21:17:52,693 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:52] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T14:17:53.707693Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 21:17:53,707 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 21:17:55,773 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:55] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 21:17:56,785 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 21:17:56,786 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 21:17:56,786 [INFO] 127.0.0.1 - - [12/Oct/2025 21:17:56] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-12 22:36:10,465 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\backend_app.py', reloading
+2025-10-12 22:36:10,552 [INFO]  * Restarting with stat
+2025-10-12 22:36:11,033 [WARNING]  * Debugger is active!
+2025-10-12 22:36:11,034 [INFO]  * Debugger PIN: 253-374-819
+2025-10-12 22:36:32,146 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\analyzer.py', reloading
+2025-10-12 22:36:32,175 [INFO]  * Restarting with stat
+2025-10-12 22:36:32,642 [WARNING]  * Debugger is active!
+2025-10-12 22:36:32,644 [INFO]  * Debugger PIN: 253-374-819
+2025-10-12 22:36:55,048 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 22:36:55,048 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:36:55,048 [INFO] 127.0.0.1 - - [12/Oct/2025 22:36:55] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 22:36:56,133 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 22:36:56,134 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:36:56,134 [INFO] 127.0.0.1 - - [12/Oct/2025 22:36:56] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-12 22:36:57,152 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T15:36:57.152706+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 22:36:57,153 [INFO] 127.0.0.1 - - [12/Oct/2025 22:36:57] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+2025-10-12 22:38:06,671 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 22:38:06,671 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:38:06,672 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:06] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 22:38:06,676 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 22:38:06,676 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:38:06,677 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:06] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-12 22:38:06,679 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T15:38:06.679696+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 22:38:06,680 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:06] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T15:38:06.688127Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 22:38:06,688 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 22:38:08,760 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:08] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:38:08.767593Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 22:38:08,767 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 22:38:10,820 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:10] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:38:10.824185Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; ls -la"}
+2025-10-12 22:38:10,824 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 22:38:12,866 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:12] "[33mPOST /comment HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T15:38:12.876622Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 22:38:12,876 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 22:38:14,911 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:14] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T15:38:14.914721Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/admin_api/logs", "payload_snippet": ""}
+2025-10-12 22:38:14,914 [INFO] ALLOWED 127.0.0.1 /admin_api/logs
+2025-10-12 22:38:16,985 [INFO] 127.0.0.1 - - [12/Oct/2025 22:38:16] "[33mGET /admin_api/logs HTTP/1.1[0m" 404 -
+2025-10-12 22:40:57,786 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\backend_app.py', reloading
+2025-10-12 22:40:57,821 [INFO]  * Restarting with stat
+2025-10-12 22:40:58,265 [WARNING]  * Debugger is active!
+2025-10-12 22:40:58,268 [INFO]  * Debugger PIN: 253-374-819
+2025-10-12 22:41:02,321 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\backend_app.py', reloading
+2025-10-12 22:41:02,365 [INFO]  * Restarting with stat
+2025-10-12 22:41:02,908 [WARNING]  * Debugger is active!
+2025-10-12 22:41:02,909 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-12T15:42:33.925068Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 22:42:33,925 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 22:42:35,997 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:35] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:42:37.026488Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 22:42:37,027 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 22:42:39,098 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:39] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:42:40.110633Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 22:42:40,110 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 22:42:42,178 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:42] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T15:42:43.204664Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 22:42:43,204 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 22:42:45,282 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:45] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 22:42:46,315 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 22:42:46,316 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:42:46,317 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:46] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 22:42:47,335 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T15:42:47.335203+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 22:42:47,335 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:47] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T15:42:48.360131Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 22:42:48,361 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 22:42:50,431 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:50] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 22:42:51,448 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 22:42:51,449 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:42:51,449 [INFO] 127.0.0.1 - - [12/Oct/2025 22:42:51] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-12 22:51:18,339 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-12 22:51:18,366 [INFO]  * Restarting with stat
+2025-10-12 22:51:18,887 [WARNING]  * Debugger is active!
+2025-10-12 22:51:18,888 [INFO]  * Debugger PIN: 253-374-819
+2025-10-12 22:51:20,901 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-12 22:51:20,932 [INFO]  * Restarting with stat
+2025-10-12 22:51:21,393 [WARNING]  * Debugger is active!
+2025-10-12 22:51:21,395 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-12T15:52:29.507432Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 22:52:29,507 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 22:52:31,570 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:31] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:52:32.582674Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 22:52:32,582 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 22:52:34,628 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:34] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:52:35.638374Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 22:52:35,638 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 22:52:37,728 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:37] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T15:52:38.740952Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 22:52:38,741 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 22:52:40,828 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:40] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 22:52:41,843 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 22:52:41,844 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:52:41,844 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:41] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 22:52:42,866 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T15:52:42.866245+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 22:52:42,867 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:42] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T15:52:43.900743Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 22:52:43,901 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 22:52:45,962 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:45] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 22:52:46,996 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 22:52:46,996 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:52:46,997 [INFO] 127.0.0.1 - - [12/Oct/2025 22:52:46] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-12 22:59:37,643 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\admin_api.py', reloading
+2025-10-12 22:59:37,682 [INFO]  * Restarting with stat
+2025-10-12 22:59:38,267 [WARNING]  * Debugger is active!
+2025-10-12 22:59:38,268 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-12T15:59:42.332621Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=%0d%0aSet-Cookie:evil=1", "payload_snippet": ""}
+2025-10-12 22:59:42,332 [INFO] ALLOWED 127.0.0.1 /search?q=%0d%0aSet-Cookie:evil=1
+2025-10-12 22:59:44,415 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:44] "GET /search?q=%0d%0aSet-Cookie:evil=1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:59:45.439280Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-12 22:59:45,440 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-12 22:59:47,512 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:47] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-12T15:59:48.523324Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/redeem", "payload_snippet": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
+2025-10-12 22:59:48,523 [INFO] ALLOWED 127.0.0.1 /redeem
+2025-10-12 22:59:50,597 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:50] "[33mPOST /redeem HTTP/1.1[0m" 404 -
+{"timestamp": "2025-10-12T15:59:51.621348Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=1/*comment*/", "payload_snippet": ""}
+2025-10-12 22:59:51,622 [INFO] ALLOWED 127.0.0.1 /search?q=1/*comment*/
+2025-10-12 22:59:53,672 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:53] "GET /search?q=1/*comment*/ HTTP/1.1" 200 -
+2025-10-12 22:59:54,688 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-12 22:59:54,688 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:59:54,688 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:54] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-12 22:59:55,702 [WARNING] BLOCKED [NEW_SUSPICIOUS_FILE]: pattern=\.(php|phtml|jsp|asp|aspx)\b -- url=/download?file=shell.php
+{"timestamp": "2025-10-12T15:59:55.702645+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/download?file=shell.php", "payload_snippet": "/download file=shell.php", "matched_rule": {"id": null, "type": "SUSPICIOUS_FILE", "pattern": "\\.(php|phtml|jsp|asp|aspx)\\b", "source": "live_detection"}}
+2025-10-12 22:59:55,703 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:55] "[31m[1mGET /download?file=shell.php HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-12T15:59:56.724736Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "; whoami"}
+2025-10-12 22:59:56,725 [INFO] ALLOWED 127.0.0.1 /comment
+2025-10-12 22:59:58,795 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:58] "[33mPOST /comment HTTP/1.1[0m" 404 -
+2025-10-12 22:59:59,817 [WARNING] BLOCKED [XSS] (id=1): <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-12 22:59:59,817 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-12 22:59:59,817 [INFO] 127.0.0.1 - - [12/Oct/2025 22:59:59] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
