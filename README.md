@@ -475,3 +475,291 @@ def get_rules():
 - Nó nhận request từ frontend, xử lý dữ liệu rule & log, và gửi phản hồi lại.
 
 - Nhờ Flask, bta có thể tách biệt frontend (giao diện) và backend (xử lý dữ liệu), tạo ra một hệ thống có cấu trúc rõ ràng, dễ mở rộng.
+
+
+---
+
+# Demo Command
+
+### Các lệnh PowerShell (và tương đương curl) để demo từng kiểu vi phạm tương ứng với các rule số 11→17 (sẽ tạo) trong rules.json. Trước khi chạy, chắc chắn đã khởi động:
+
+- WAF: python backend/waf.py (port 5000)
+
+- Backend app: python backend/backend_app.py (port 5001)
+
+- Admin API: python backend/admin_api.py (port 5002)
+
+Mỗi lệnh sẽ gọi WAF (http://127.0.0.1:5000/ ...) — nếu rule khớp, WAF trả 403 và ghi log JSON vào backend/logs/waf.log. Sau mỗi test, có thể kiểm tra log qua Admin API:
+```
+# Xem logs (PowerShell)
+Invoke-RestMethod -Uri "http://127.0.0.1:5002/api/logs" -Method Get
+
+# Hoặc dùng curl
+curl "http://127.0.0.1:5002/api/logs"
+```
+
+### 1) CRLF / Header injection (rule id 11)
+
+Mục tiêu: chèn chuỗi CRLF (%0d%0a hoặc \r\n) + header tên như Set-Cookie hay Location. Mô phỏng header injection / HTTP response splitting — kẻ tấn công cố gắng chèn CRLF (%0d%0a hoặc \r\n) tiếp theo là một header (ví dụ Set-Cookie: hoặc Location:) để chèn header giả, thao túng cookie hoặc redirect người dùng.
+
+Rule liên quan: CRLF_INJECTION
+
+Pattern: (?:%0d%0a|\r\n).*(?:Content-Type:|Set-Cookie:|Location:)
+
+Cách hoạt động & lưu ý:
+
+- Gửi trong query vì dễ quan sát; WAF sẽ URL-decode nội dung trước khi so khớp.
+
+- Nếu rule bật → WAF trả 403 + JSON lý do, đồng thời ghi log BLOCKED với matched_rule.
+
+- Nếu browser tự encode/normalize khác, dùng curl với %0d%0a là an toàn.
+
+**Kết quả mong đợi**: 
+- 403 + log BLOCKED; admin-ui / admin_api sẽ hiển thị entry có CRLF_INJECTION.
+
+PowerShell (GET, query-encoded):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/search?q=%0d%0aSet-Cookie:evil=1" -Method Get -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i "http://127.0.0.1:5000/search?q=%0d%0aSet-Cookie:evil=1"
+```
+
+PowerShell (POST body with raw CRLF — may be tricky in console; better send encoded):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/comment" -Method Post -Body "%0d%0aLocation:http://evil.exampl
+```
+
+### 2) XPath / LDAP injection hint (rule id 12)
+
+Mục tiêu: gửi payload có chữ xpath/ldap hoặc filter=(...) ví dụ XPath expression. Mô phỏng payload có dạng XPath expression hoặc các chuỗi liên quan xpath, ldap, filter= → dùng để thử tấn công XML/XPath/LDAP injection (khi backend xử lý XML/LDAP).
+
+Rule liên quan: XPATH_LDAP_INJECTION
+
+Pattern: (?:\b(xpath|ldap)\b|filter=\(|\[\*\])
+
+Cách hoạt động & lưu ý:
+
+- Payload không trực tiếp gây lỗi trên app demo (app chỉ hiển thị query) — mục đích demo là để WAF log/alert cho pattern này.
+
+- Rule mặc định trong file có thể đang disabled; bật trước khi demo nếu muốn block.
+
+Kết quả mong đợi:
+
+- Nếu rule enabled → 403 + log BLOCKED.
+
+- Nếu rule disabled → request đi qua (200) và admin logs ghi ALLOWED.
+
+**Kết quả mong đợi:**
+
+- Nếu rule enabled → 403 + log BLOCKED.
+
+- Nếu rule disabled → request đi qua (200) và admin logs ghi ALLOWED.
+
+PowerShell (GET):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/search?q=filter=(//* )[1]" -Method Get -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i -G "http://127.0.0.1:5000/search" --data-urlencode "q=filter=(//* )[1]"
+```
+
+### 3) Suspicious long token (rule id 13)
+
+Mục tiêu: gửi chuỗi >=80 ký tự (alnum/_/-) để kích hoạt.
+
+Giả lập chuỗi dài khả nghi (base64, shellcode, long token) — rule cảnh báo khi có chuỗi alnum >= 80 ký tự. Dùng để phát hiện payload dài bất thường.
+
+Rule liên quan: SUSPICIOUS_LONG_TOKEN
+
+Pattern: [A-Za-z0-9\-_]{80,}
+
+Cách hoạt động & lưu ý:
+
+- Vì dễ false positive (ví dụ JWT, API token), rule thường disabled hoặc chỉ log.
+
+- Dùng POST body giúp tránh URL encoding issues.
+
+Kết quả mong đợi:
+
+- Nếu rule enabled → 403; thường demo sẽ để rule disabled và xem log để minh họa cảnh báo.
+
+PowerShell (POST with long token in body):
+```
+# tạo token 90 ký tự
+$tok = ('A' * 90)
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/redeem" -Method Post -Body $tok -ContentType "text/plain" -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i -X POST "http://127.0.0.1:5000/redeem" --data "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+```
+
+### 4) SQL comment / obfuscation (rule id 14)
+
+Mục tiêu: chứa /* ... */ trong input.
+- /* ... */ là kỹ thuật obfuscation tấn công SQL (cố tình chèn comment để né bộ lọc).
+
+- UNION SELECT ... mô phỏng SQL injection kiểu union-based để trích dữ liệu.
+
+Rule liên quan:
+- SQL_COMMENT_OBFUSCATION pattern: (?:/\*.*?\*/)
+
+- SQLi pattern (seed/analyzer): (?:union\s+select\b) hoặc analyzer-generated (UNION|SELECT).*FROM
+
+**Kết quả mong đợi:**
+
+- Nếu rule enabled → 403 + BLOCKED log.
+
+- Nếu rule disabled → request đi qua; analyzer sau này có thể tạo rule nếu nhiều BLOCKs xuất hiện.
+
+PowerShell (GET):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/search?q=1/*comment*/" -Method Get -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i "http://127.0.0.1:5000/search?q=1/*comment*/" (SQL comment obfuscation)
+```
+
+Ta cũng có thể thử typical SQL payloads:
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users" -Method Get -ErrorAction SilentlyContinue (UNION-based SQLi)
+```
+
+### 5) Suspicious file extension (rule id 15)
+
+Mục tiêu: truy cập tải/đường dẫn file .php, .jsp, .asp v.v.
+- Phát hiện truy vấn/đường dẫn chứa extension thực thi server-side (.php, .jsp, .asp) — thường liên quan upload shell hoặc truy cập file thực thi.
+
+- Kết hợp với path traversal (../) có thể dẫn tới LFI/RFI.
+
+Rule liên quan: SUSPICIOUS_FILE_EXT và PATH_TRAVERSAL
+
+- SUSPICIOUS_FILE_EXT pattern: (?:\.phps?|\.phtml|\.jsp|\.asp[x]?)$
+
+- PATH_TRAVERSAL pattern: (?:%2e%2e%2f|%2e%2e\/|\.{2}%2f|\.{2}\/) hoặc (\.\./|/etc/passwd|/proc/self/environ)
+
+Cách hoạt động & lưu ý:
+
+- Để trigger, gửi tên file trong query/path.
+
+- Có thể cần toLower/normalize để match encoded sequences.
+
+**Kết quả mong đợi**: 403 + BLOCKED log nếu rule enabled.
+
+PowerShell (GET):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/download?file=shell.php" -Method Get -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i "http://127.0.0.1:5000/download?file=shell.php"
+```
+
+Hoặc path traversal test:
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/search?q=../../etc/passwd" -Method Get -ErrorAction SilentlyContinue
+```
+
+### 6) Command injection pattern (rule id 16)
+
+Mục tiêu: chèn ; ls hoặc | whoami v.v. Mô phỏng command injection — chèn shell metacharacters (;, |) kèm lệnh (whoami, ls, cat, rm), cố gắng thực thi lệnh trên server.
+
+Rule liên quan: regex pattern: ([;&|]{1,2}\s*(cat|ls|whoami|id|rm)\b)
+
+Cách hoạt động & lưu ý:
+
+- Rule có thể dễ false-positive nếu ứng dụng chấp nhận chuỗi như a|b hợp lệ; cân nhắc bật chỉ ở môi trường nhạy cảm.
+
+- Gửi POST body hoặc encoded GET để đảm bảo WAF nhận đúng chuỗi.
+
+**Kết quả mong đợi**: 403 + BLOCKED log khi match.
+
+
+PowerShell (GET with encoded characters):
+```
+# dùng --data-urlencode with curl style via Invoke-RestMethod not trivial; use curl for simplicity:
+curl -i "http://127.0.0.1:5000/search?q=%3B%20ls%20-l"
+```
+
+curl raw:
+```
+curl -i "http://127.0.0.1:5000/search?q=%3B%20whoami"
+```
+
+PowerShell using POST body (raw semicolon):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/comment" -Method Post -Body "; ls -la" -ContentType "text/plain" -ErrorAction SilentlyContinue
+```
+
+### 7) XSS with <script> (rule id 17)
+
+Mục tiêu: gửi <script>...</script> trong body (POST) hoặc query. Mô phỏng Cross-Site Scripting (XSS) kiểu chèn thẻ <script> trong input, muốn chạy script trên trình duyệt nạn nhân.
+
+Rule liên quan: XSS_ATTACK / XSS
+
+Pattern: <script[^>]*?>[\s\S]*?<\/script> hoặc <script.*?>.*?</script>
+
+Cách hoạt động & lưu ý:
+
+- POST body thường ít bị encoding, dễ trigger.
+
+- WAF decode/normalize trước khi match; nhiều WAF còn áp thêm HTML-entity decode để bắt evasion (&lt;script&gt;).
+
+**Kết quả mong đợi**: 403 + BLOCKED log.
+
+PowerShell (POST body):
+```
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/comment" -Method Post -Body "<script>alert('xss')</script>" -ContentType "text/plain" -ErrorAction SilentlyContinue
+```
+
+curl:
+```
+curl -i -X POST "http://127.0.0.1:5000/comment" -H "Content-Type: text/plain" --data "<script>alert('xss')</script>"
+```
+
+GET variant (encoded):
+```
+curl -i "http://127.0.0.1:5000/search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+```
+
+### Kiểm tra kết quả
+
+- Nếu rule match → WAF trả HTTP 403 với JSON chứa "message": "Blocked by WAF (rule ...)".
+
+- Kiểm tra log JSON file backend/logs/waf.log hoặc Admin API GET /api/logs.
+
+- Admin UI (http://localhost:8080) → Load Logs / Load Rules sẽ hiển thị cập nhật.
+
+- Dùng Admin API:
+
+    - Rules: curl "http://127.0.0.1:5002/api/rules"
+
+    - Logs: curl "http://127.0.0.1:5002/api/logs"
+- 
+
+### Lưu ý / Troubleshoot nhanh
+
+- Nếu request bị browser auto-encode (GET), dùng POST body để đảm bảo chuỗi không bị encode.
+
+- Một vài pattern (ví dụ long token) có thể bị disabled (enabled: false) — check rules.json trước.
+
+- Nếu Admin API CORS lỗi khi dùng admin-ui, chắc chắn admin_api.py đã CORS(app).
+
+- Để tránh false-positive thử từng rule 1-1 với payload nhỏ gọn.
+
+- Trước demo, enalbe/disable rule mong muốn bằng sửa rules.json để minh hoạ block vs allow. (hoặc dùng UI nếu có endpoint toggle).
+
+- Dùng POST body khi bạn cần payload không bị URL-encoding.
+
+- Kiểm soát false positives: một vài rule (long token, cmd injection, xpath...) tốt nhất để enabled: false và chỉ log để phòng FP trong demo nếu backend giả lập có input hợp lệ.
+
+- Analyzer: nếu bạn muốn tự động sinh rule từ logs, chạy GET /api/analyze sau khi có nhiều BLOCK để xem nó thêm rule vào rules.json.
