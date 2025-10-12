@@ -1,5 +1,5 @@
-import json, os, re
-from datetime import datetime, timedelta
+import json, os
+from datetime import datetime
 
 LOG_FILE = "logs/waf.log"
 RULES_FILE = "rules.json"
@@ -14,14 +14,20 @@ def analyze_logs():
         print("⚠️ Không có log để phân tích.")
         return
 
+    lines = []
     with open(LOG_FILE, encoding="utf-8") as f:
-        lines = [json.loads(l) for l in f if l.strip().startswith("{")]
+        for line in f:
+            if line.strip().startswith("{"):
+                try:
+                    lines.append(json.loads(line))
+                except Exception as e:
+                    print(f"Bỏ qua log lỗi: {e}")
 
-    # Gom nhóm theo pattern + type
     stats = {}
     for entry in lines:
         if entry.get("event") != "BLOCKED":
             continue
+
         rule = entry.get("matched_rule", {})
         ptype = rule.get("type")
         patt = rule.get("pattern")
@@ -29,9 +35,10 @@ def analyze_logs():
             continue
 
         key = (ptype, patt)
-        stats.setdefault(key, {"count": 0, "ips": set()})
+        if key not in stats:
+            stats[key] = {"count": 0, "ips": set()}
         stats[key]["count"] += 1
-        if "src_ip" in entry:
+        if entry.get("src_ip"):
             stats[key]["ips"].add(entry["src_ip"])
 
     # Đọc rules cũ
@@ -66,10 +73,11 @@ def analyze_logs():
         rules.extend(new_rules)
         with open(RULES_FILE, "w", encoding="utf-8") as f:
             json.dump(rules, f, indent=2, ensure_ascii=False)
-        print(f"✅ Đã thêm {len(new_rules)} rule mới vào rules.json.")
+        print(f"✅ Đã thêm {len(new_rules)} rule mới vào rules.json:")
+        for r in new_rules:
+            print(f"   - {r['type']} :: {r['pattern']}")
     else:
         print("Không có rule mới đạt ngưỡng.")
-
 
 if __name__ == "__main__":
     analyze_logs()
