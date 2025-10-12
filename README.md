@@ -391,7 +391,7 @@ Cụ thể:
 ### 🌐 4. Luồng hoạt động của hệ thống
 
 Dưới đây là sơ đồ luồng hoạt động tổng thể trong project của bạn:
-
+```
 ┌──────────────────────────────┐
 │  Người dùng (Admin UI)       │
 │  → index.html, script.js     │
@@ -421,6 +421,7 @@ Dưới đây là sơ đồ luồng hoạt động tổng thể trong project c�
 │  - script.js xử lý JSON      │
 │  - Render ra bảng HTML       │
 └──────────────────────────────┘
+```
 
 ### 🧠 5. Flask trong project RuleForge giúp ích như thế nào?
 |          Mục tiêu          |	                    Flask đảm nhận                            |
@@ -744,7 +745,6 @@ curl -i "http://127.0.0.1:5000/search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
     - Rules: curl "http://127.0.0.1:5002/api/rules"
 
     - Logs: curl "http://127.0.0.1:5002/api/logs"
-- 
 
 ### Lưu ý / Troubleshoot nhanh
 
