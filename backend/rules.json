@@ -1,58 +1,182 @@
 [
   {
     "id": 1,
-    "type": "regex",
-    "pattern": "(<script>.*?</script>)",
+    "type": "XSS",
+    "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>",
     "enabled": true,
-    "source": "seed"
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Chặn payload XSS dạng <script>...</script>. Dùng để phát hiện script tag trực tiếp trong body/query. (FP risk: thấp nếu đã decode input)."
   },
   {
     "id": 2,
-    "type": "regex",
-    "pattern": "(UNION.*SELECT.*FROM)",
-    "enabled": true,
-    "source": "seed"
+    "type": "XSS",
+    "pattern": "(?:on\\w+\\s*=\\s*['\\\"][^'\\\"]+['\\\"])",
+    "enabled": false,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body",
+      "headers"
+    ],
+    "severity": "medium",
+    "action": "block",
+    "comment": "Chặn attribute handler (ví dụ onerror=, onclick=) có thể dùng cho XSS; dễ FP nếu ứng dụng cho phép inline event attributes trong rich HTML."
   },
   {
     "id": 3,
-    "type": "regex",
-    "pattern": "(ls|cat|rm|whoami|ping|nc|netcat|curl|wget)",
+    "type": "SQLi",
+    "pattern": "(?:union\\s+select\\b)",
     "enabled": true,
-    "source": "admin"
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Phát hiện pattern 'UNION SELECT' – chỉ dùng khi normalized và case-insensitive. Rất hiệu quả với SQLi dạng union-based."
   },
   {
     "id": 4,
-    "type": "regex",
-    "pattern": "(onerror|onload|onmouseover|javascript:)",
-    "enabled": true,
-    "source": "admin"
+    "type": "SQLi",
+    "pattern": "(?:\\b(or|and)\\s+\\d+\\s*=\\s*\\d+\\b|\\b(or|and)\\s+['\\\"][^'\\\"]+['\\\"]\\s*=\\s*['\\\"][^'\\\"]+['\\\"])(?!.*(legit_field|safe_param))",
+    "enabled": false,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "medium",
+    "action": "block",
+    "comment": "Phát hiện boolean tautology hoặc boolean comparison thường dùng cho SQLi (vd: ' or '1'='1'). Đặt disabled mặc định vì dễ FP trên query hợp lệ containing 'or'/'and'. Thêm exclusion để giảm FP."
   },
   {
     "id": 5,
-    "type": "regex",
-    "pattern": "(OR\\s+1=1|DROP\\s+TABLE|INSERT\\s+INTO)",
+    "type": "LFI",
+    "pattern": "(?:\\.\\./|/etc/passwd|/proc/self/environ)",
     "enabled": true,
-    "source": "admin"
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Path traversal / LFI: phát hiện '..' traversal hoặc tham chiếu tới file hệ thống thường gặp (/etc/passwd). Sử dụng để chặn attempts đọc file hệ thống."
   },
   {
     "id": 6,
-    "type": "regex",
-    "pattern": "(\\.\\./|\\.\\.%2F|%2e%2e%2f)",
-    "enabled": true,
-    "source": "admin"
+    "type": "RFI/SSRF",
+    "pattern": "(?:https?:\\/\\/(?:127\\.0\\.0\\.1|localhost|169\\.254\\.169\\.254)|file:\\/\\/|php:\\/\\/)",
+    "enabled": false,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Phát hiện request tới internal metadata IP hoặc các scheme nguy hiểm (file://, php://). Mặc định disabled — dùng khi site có trường URL input (thumbnails, fetcher)."
   },
   {
     "id": 7,
-    "type": "regex",
-    "pattern": "(bash|sh|eval|exec|system|passthru)",
-    "enabled": true,
-    "source": "admin"
+    "type": "CMD_INJECTION",
+    "pattern": "(?:;\\s*(?:rm|shutdown|reboot|nc|curl|wget)\\b|\\|\\s*(?:rm|nc|curl|wget)\\b)",
+    "enabled": false,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Phát hiện các chuỗi shell metacharacters kết hợp với lệnh nguy hiểm (ví dụ ; rm -rf). Dễ FP nếu app cho phép các ký tự này hợp lệ — enable cẩn trọng."
   },
   {
     "id": 8,
-    "type": "regex",
-    "pattern": "(sqlmap|nikto|burp|nessus|metasploit)",
+    "type": "FILE_UPLOAD_RCE",
+    "pattern": "(?:<\\?php|<%\\s*script|eval\\(|base64_decode\\()",
     "enabled": true,
-    "source": "admin"
+    "source": "seed",
+    "apply_to": [
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Phát hiện đoạn mã server-side (PHP, ASP, eval(...), base64_decode) có thể xuất hiện trong file upload hoặc nội dung. Dùng để chặn upload file chứa mã thực thi."
+  },
+  {
+    "id": 9,
+    "type": "PATH_TRAVERSAL",
+    "pattern": "(?:%2e%2e%2f|%2e%2e\\/|\\.\\.%2f|\\.\\./)",
+    "enabled": true,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "medium",
+    "action": "block",
+    "comment": "Path traversal encoded variants (.. /) — chặn các dạng đã được URL-encoded. Cần decode input trước match; giữ pattern để bắt evasion bằng encoding."
+  },
+  {
+    "id": 10,
+    "type": "OPEN_REDIRECT",
+    "pattern": "(?:redirect=|url=|next=)[^\\s]+(?:https?:\\/\\/[^\\s]+)",
+    "enabled": false,
+    "source": "seed",
+    "apply_to": [
+      "query"
+    ],
+    "severity": "low",
+    "action": "alert",
+    "comment": "Phát hiện tham số redirect chứa external URL (có thể gây open redirect). Disabled mặc định — có thể dùng để log/alert thay vì block."
+  },
+  {
+    "id": 11,
+    "type": "XSS",
+    "pattern": "(?:javascript:|eval\\()",
+    "enabled": true,
+    "source": "seed",
+    "apply_to": [
+      "headers",
+      "cookie"
+    ],
+    "severity": "medium",
+    "action": "block",
+    "comment": "Phát hiện payload XSS trong headers hoặc cookie."
+  },
+  {
+    "id": 12,
+    "type": "XXE",
+    "pattern": "<!ENTITY[^>]+>",
+    "enabled": true,
+    "source": "seed",
+    "apply_to": [
+      "body"
+    ],
+    "severity": "high",
+    "action": "block",
+    "comment": "Phát hiện XML External Entity trong body (thường dùng trong XML POST requests)."
+  },
+  {
+    "id": 13,
+    "type": "PATH_TRAVERSAL",
+    "pattern": "(?:%25(?:2e|2E)(?:2e|2E)(?:2f|2F|%2f|%2F)|%u002e%u002e%u002f)",
+    "enabled": true,
+    "source": "seed",
+    "apply_to": [
+      "query",
+      "body"
+    ],
+    "severity": "medium",
+    "action": "block",
+    "comment": "Chặn double URL-encoded hoặc Unicode-encoded path traversal."
   }
 ]
