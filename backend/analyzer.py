@@ -1,33 +1,83 @@
-import re, json
+import json, os
+from datetime import datetime
 
-def analyze_logs(log_file="logs/waf.log", rules_file="rules.json"):
-    with open(log_file) as f:
-        logs = f.readlines()
+LOG_FILE = "logs/waf.log"
+RULES_FILE = "rules.json"
 
-    suspicious_payloads = [line for line in logs if "BLOCKED" in line]
+# Ngưỡng sinh rule tự động
+THRESHOLD_OCCURRENCES = 3
+THRESHOLD_IPS = 2
+AUTO_ENABLE = True
+
+def analyze_logs():
+    if not os.path.exists(LOG_FILE):
+        print("⚠️ Không có log để phân tích.")
+        return
+
+    lines = []
+    with open(LOG_FILE, encoding="utf-8") as f:
+        for line in f:
+            if line.strip().startswith("{"):
+                try:
+                    lines.append(json.loads(line))
+                except Exception as e:
+                    print(f"Bỏ qua log lỗi: {e}")
+
+    stats = {}
+    for entry in lines:
+        if entry.get("event") != "BLOCKED":
+            continue
+
+        rule = entry.get("matched_rule", {})
+        ptype = rule.get("type")
+        patt = rule.get("pattern")
+        if not ptype or not patt:
+            continue
+
+        key = (ptype, patt)
+        if key not in stats:
+            stats[key] = {"count": 0, "ips": set()}
+        stats[key]["count"] += 1
+        if entry.get("src_ip"):
+            stats[key]["ips"].add(entry["src_ip"])
+
+    # Đọc rules cũ
+    if os.path.exists(RULES_FILE):
+        try:
+            with open(RULES_FILE, "r", encoding="utf-8") as f:
+                rules = json.load(f)
+        except Exception:
+            rules = []
+    else:
+        rules = []
+
+    existing = {(r["type"], r["pattern"]) for r in rules}
+    next_id = max((r.get("id", 0) for r in rules), default=0) + 1
 
     new_rules = []
-    for entry in suspicious_payloads:
-        # ví dụ: phát hiện SQLi
-        if "UNION" in entry.upper() or "SELECT" in entry.upper():
-            new_rules.append({"type": "regex", "pattern": r"(UNION|SELECT).*FROM"})
-
-        # ví dụ: phát hiện XSS
-        if "<script>" in entry.lower():
-            new_rules.append({"type": "regex", "pattern": r"<script.*?>.*?</script>"})
+    for (ptype, patt), data in stats.items():
+        if (ptype, patt) in existing:
+            continue
+        if data["count"] >= THRESHOLD_OCCURRENCES and len(data["ips"]) >= THRESHOLD_IPS:
+            new_rules.append({
+                "id": next_id,
+                "type": ptype,
+                "pattern": patt,
+                "enabled": AUTO_ENABLE,
+                "source": "auto_analyzer",
+                "comment": f"Tự sinh từ logs ({data['count']} lần / {len(data['ips'])} IP)"
+            })
+            next_id += 1
 
     if new_rules:
-        with open(rules_file) as f:
-            rules = json.load(f)
-
         rules.extend(new_rules)
-
-        with open(rules_file, "w") as f:
-            json.dump(rules, f, indent=2)
-
-        print(f"Added {len(new_rules)} new rules")
+        with open(RULES_FILE, "w", encoding="utf-8") as f:
+            json.dump(rules, f, indent=2, ensure_ascii=False)
+        print(f"✅ Đã thêm {len(new_rules)} rule mới vào rules.json:")
+        for r in new_rules:
+            print(f"   - {r['type']} :: {r['pattern']}")
     else:
-        print("No new rules found.")
+        print("Không có rule mới đạt ngưỡng.")
 
 if __name__ == "__main__":
     analyze_logs()

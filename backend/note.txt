@@ -92,3 +92,94 @@ python waf.py
 Trong PyCharm:
 
 Bạn có thể tạo 2 (hoặc 3) Run Configurations kiểu "Python" để chạy backend_app.py, waf.py, admin_api.py. PyCharm tích hợp virtualenv; chọn interpreter là venv của project. Chạy từng config trong các tab run khác nhau.
+
+
+
+
+Các pattern mẫu để thử:
+,
+  {
+    "id": 11,
+    "type": "CRLF_INJECTION",
+    "pattern": "(?:%0d%0a|\\r\\n).*(?:Content-Type:|Set-Cookie:|Location:)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Phát hiện CRLF + header injection (ví dụ chèn 'Set-Cookie' hoặc 'Location'). Bắt cả dạng encode (%0d%0a)."
+  },
+  {
+    "id": 12,
+    "type": "XPATH_LDAP_INJECTION",
+    "pattern": "(?:\\b(xpath|ldap)\\b|filter=\\(|\\[\\*\\])",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Pattern gợi ý XPath/LDAP injection vectors. Dùng để log/alert nếu app dùng XML/LDAP queries; dễ FP, bật thận trọng."
+  },
+  {
+    "id": 13,
+    "type": "SUSPICIOUS_LONG_TOKEN",
+    "pattern": "[A-Za-z0-9\\-_]{80,}",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Chuỗi dài ký tự alphanumeric (>=80) có thể là payload mã hóa / token / shellcode — chỉ log vì dễ FP (ví dụ long tokens)."
+  },
+  {
+    "id": 14,
+    "type": "SQL_COMMENT_OBFUSCATION",
+    "pattern": "(?:/\\*.*?\\*/)",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Phát hiện SQL comment obfuscation (/*...*/), kẻ tấn công có thể chèn comment để né một số bộ lọc. Dùng để log/analyze."
+  },
+  {
+    "id": 15,
+    "type": "SUSPICIOUS_FILE_EXT",
+    "pattern": "(?:\\.phps?|\\.phtml|\\.jsp|\\.asp[x]?)$",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Chặn upload hoặc access đến file với extension thực thi server-side (php, phtml, jsp, asp) — có thể ngăn người upload code."
+  },
+  {
+    "id": 16,
+    "type": "regex",
+    "pattern": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Phát hiện Command Injection — khi người dùng cố gắng thực thi lệnh hệ thống."
+  },
+  {
+    "id": 17,
+    "type": "XSS_ATTACK",
+    "pattern": "<script.*?>.*?</script>",
+    "enabled": true,
+    "source": "analyzer",
+    "comment": "Phát hiện đoạn mã XSS chứa thẻ <script>."
+  }
+
+
+  12/10/2025
+  Đề chạy demo_attacks.ps1, nhập các lệnh:
+- Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+- ./demo_attacks.ps1
+
+[PowerShell Script demo_attacks.ps1]
+        │
+        ▼
+Gửi request thử nghiệm (XSS, SQLi, CRLF...) → http://127.0.0.1:5000
+        │
+        ▼
+ [waf.py]  — Web Application Firewall
+     ├─ Đọc rules.json
+     ├─ Kiểm tra pattern + heuristic
+     ├─ Nếu khớp → BLOCK + ghi log JSON (waf.log)
+     └─ Nếu hợp lệ → chuyển tiếp request tới backend_app.py
+        │
+        ▼
+ [backend_app.py] — Flask demo app (giả lập web bán điện thoại)
+     ├─ /search?q=... → render HTML kết quả
+     └─ /login → nhận form đăng nhập demo
+        │
+        ▼
+ [admin_api.py] — REST API quản trị
+     ├─ /api/rules → xem rule hiện có
+     ├─ /api/analyze → chạy analyzer.py sinh rule tự động
+     └─ /api/logs → đọc waf.log (PowerShell script gọi để xem log)
