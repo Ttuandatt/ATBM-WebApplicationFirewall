@@ -183,3 +183,242 @@ Gửi request thử nghiệm (XSS, SQLi, CRLF...) → http://127.0.0.1:5000
      ├─ /api/rules → xem rule hiện có
      ├─ /api/analyze → chạy analyzer.py sinh rule tự động
      └─ /api/logs → đọc waf.log (PowerShell script gọi để xem log)
+
+
+
+     13/10/2025(tuandat):
+     1) Vì sao analyzer không tạo rule
+
+Analyzer chỉ xem các dòng JSON BLOCKED trong logs/waf.log. Nếu WAF không block payload thì analyzer không biết payload đó là attack.
+
+Trong log bạn paste, nhiều request là ALLOWED (ví dụ '/ OR '1'='1 bị ALLOWED), vì:
+
+WAF chỉ có seed rule bắt UNION SELECT (id 3) và một số pattern khác; boolean tautology kiểu ' OR '1'='1 rule tương ứng (id 4) có enabled: false theo file rules mẫu của bạn → WAF không chặn.
+
+Hoặc heuristic detect trong waf.py không có pattern cụ thể cho payload bạn gửi.
+
+Thêm nữa: ngưỡng IP (THRESHOLD_IPS=2) chặn việc tạo rule khi tất cả request đến từ một IP duy nhất (localhost) — hợp lý cho production nhưng khó demo trên máy dev.
+
+Kết quả: analyzer không thấy đủ (count, distinct IP) trên một matched_rule.pattern → không thêm rule.
+
+2) Code analyzer.py chỉnh sẵn cho demo
+
+Tôi chuẩn bị file analyzer.py hoàn chỉnh (thay thế file hiện tại) có:
+
+DEMO_MODE = True bật cấu hình demo: THRESHOLD_OCCURRENCES=2, THRESHOLD_IPS=1 (dễ tạo rule khi test cục bộ).
+
+Vẫn giữ cấu trúc an toàn: chỉ lấy entries event=="BLOCKED"; bỏ qua log không phải JSON.
+
+In rõ rules mới thêm.
+
+Thay file analyzer.py bằng nội dung này:
+
+# analyzer.py
+import json, os
+from datetime import datetime
+
+LOG_FILE = "logs/waf.log"
+RULES_FILE = "rules.json"
+
+# Demo / production switches
+DEMO_MODE = True
+
+if DEMO_MODE:
+    THRESHOLD_OCCURRENCES = 2   # demo: chỉ cần 2 lần
+    THRESHOLD_IPS = 1           # demo: 1 IP là đủ
+else:
+    THRESHOLD_OCCURRENCES = 3   # production example
+    THRESHOLD_IPS = 2
+
+AUTO_ENABLE = True  # nếu True -> tự bật rule (demo). Trong prod có thể False (require review).
+
+def analyze_logs():
+    if not os.path.exists(LOG_FILE):
+        print("⚠️ Không có log để phân tích.")
+        return
+
+    # đọc từng dòng JSON trong log (mỗi dòng json là 1 entry)
+    lines = []
+    with open(LOG_FILE, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            # chỉ parse các dòng bắt đầu bằng '{' (chỉ JSON structured logs)
+            if line.startswith("{"):
+                try:
+                    obj = json.loads(line)
+                    lines.append(obj)
+                except Exception as e:
+                    # có thể có human-readable log lines mixed in -> bỏ qua
+                    print(f"Bỏ qua log không parse được: {e}")
+
+    # thống kê: key = (type, pattern) -> count + set(ips)
+    stats = {}
+    for entry in lines:
+        if entry.get("event") != "BLOCKED":
+            continue
+        rule = entry.get("matched_rule", {})
+        ptype = rule.get("type")
+        patt = rule.get("pattern")
+        if not ptype or not patt:
+            continue
+        key = (ptype, patt)
+        if key not in stats:
+            stats[key] = {"count": 0, "ips": set()}
+        stats[key]["count"] += 1
+        if entry.get("src_ip"):
+            stats[key]["ips"].add(entry.get("src_ip"))
+
+    # đọc rules hiện có
+    if os.path.exists(RULES_FILE):
+        try:
+            with open(RULES_FILE, "r", encoding="utf-8") as f:
+                rules = json.load(f)
+        except Exception:
+            rules = []
+    else:
+        rules = []
+
+    existing = {(r.get("type"), r.get("pattern")) for r in rules if "type" in r and "pattern" in r}
+    next_id = max((r.get("id", 0) for r in rules), default=0) + 1
+
+    new_rules = []
+    for (ptype, patt), data in stats.items():
+        if (ptype, patt) in existing:
+            continue
+        if data["count"] >= THRESHOLD_OCCURRENCES and len(data["ips"]) >= THRESHOLD_IPS:
+            new_rule = {
+                "id": next_id,
+                "type": ptype,
+                "pattern": patt,
+                "enabled": AUTO_ENABLE,
+                "source": "auto_analyzer",
+                "comment": f"Tự sinh từ logs ({data['count']} lần / {len(data['ips'])} IP)"
+            }
+            new_rules.append(new_rule)
+            next_id += 1
+
+    if new_rules:
+        rules.extend(new_rules)
+        with open(RULES_FILE, "w", encoding="utf-8") as f:
+            json.dump(rules, f, indent=2, ensure_ascii=False)
+        print(f"✅ Đã thêm {len(new_rules)} rule mới vào {RULES_FILE}:")
+        for r in new_rules:
+            print(f"   - id={r['id']} type={r['type']} pattern={r['pattern']}")
+    else:
+        print("Không có rule mới đạt ngưỡng.")
+
+if __name__ == "__main__":
+    analyze_logs()
+
+
+Lưu ý: bật DEMO_MODE = False khi bạn về môi trường thực. AUTO_ENABLE=True giúp demo dễ thấy tác dụng tự động, nhưng trong production nên AUTO_ENABLE=False (admin review).
+
+3) Các lệnh test — bước-by-step (để analyzer tạo rule)
+
+Phần này giả sử bạn đã:
+
+waf.py đang chạy (port 5000),
+
+backend_app.py đang chạy (port 5001),
+
+admin_api.py đang chạy (port 5002),
+
+bạn đã thay analyzer.py bằng file demo trên.
+
+Bước A — làm cho WAF block payloads
+
+(để analyzer thấy BLOCKED entries)
+
+Chạy payloads bị WAF chặn (dùng UNION SELECT vì rules mẫu của bạn có rule bắt union select):
+
+PowerShell (chạy 3 lần):
+
+Invoke-WebRequest -Uri "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users" -UseBasicParsing
+Invoke-WebRequest -Uri "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users" -UseBasicParsing
+Invoke-WebRequest -Uri "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users" -UseBasicParsing
+
+
+(curl):
+
+curl -s "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users"
+curl -s "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users"
+curl -s "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users"
+
+
+Nếu WAF trả 403 cho URL này thì đã block → check logs/waf.log bạn sẽ có 3 mục BLOCKED cho pattern tương ứng.
+
+Bước B — chạy analyzer
+
+Từ thư mục backend:
+
+python analyzer.py
+
+
+Bạn sẽ thấy output kiểu:
+
+✅ Đã thêm 1 rule mới vào rules.json:
+   - id=18 type=SQLi pattern=(?:union\s+select\b)
+
+Bước C — xác minh rules.json và WAF
+
+Mở rules.json để xem rule mới có enabled: true (vì AUTO_ENABLE=True trên demo).
+
+Lặp lại request tương tự, WAF sẽ chặn theo rule mới (nếu trước đó có trường hợp WAF live detection chặn, rule mới sẽ tồn tại để chặn tương tự trong tương lai).
+
+4) Nếu bạn muốn test nhiều IP (không phải localhost)
+
+Analyzer mặc định yêu cầu THRESHOLD_IPS=2. Trong demo bạn có thể:
+
+Giảm THRESHOLD_IPS=1 (đã có trong DEMO_MODE) — làm xong.
+
+Hoặc gửi request từ các máy/VM khác để có nhiều src_ip khác nhau.
+
+5) Lưu ý / debug tips khi vẫn không thấy rule tạo
+
+Kiểm tra logs/waf.log có dòng JSON BLOCKED không (dạng {"timestamp":..., "event":"BLOCKED", "matched_rule": {...}}). Analyzer chỉ đọc các dòng JSON. Nếu log chỉ chứa human-readable lines (non-json), analyzer bỏ qua.
+
+Kiểm tra matched_rule có type và pattern không — nếu matched_rule thiếu pattern, analyzer không thể nhóm.
+
+Kiểm tra rules.json có cấu trúc chuẩn JSON (có id,type,pattern) — analyzer dùng để tránh duplicate.
+
+Nếu WAF ghi BLOCKED nhưng matched_rule chứa _re (Pattern object) thay vì plain string, analyzer sẽ không parse — đảm bảo bạn lưu matched_rule trong log là dict với string fields. (Trường hợp trước bạn thấy lỗi Object of type Pattern is not JSON serializable — điều đó xảy ra nếu WAF cố gắng json.dump(r) với r["_re"] = compiled regex. Trong waf.py bạn đang log matched_rule: rule — cần đảm bảo matched_rule không chứa trường _re trước khi viết log.)
+
+Nếu bạn gặp lỗi Object of type Pattern is not JSON serializable
+
+Sửa waf.py ở chỗ append_json_log / tạo matched_rule — đừng ghi toàn bộ rule (vì có _re). Ghi chỉ những trường cần thiết:
+
+append_json_log({
+    "timestamp": timestamp,
+    "event": "BLOCKED",
+    "src_ip": src_ip,
+    "url": url,
+    "payload_snippet": content[:300],
+    "matched_rule": {
+        "id": rule.get("id"),
+        "type": rule.get("type"),
+        "pattern": rule.get("pattern"),
+        "source": rule.get("source")
+    }
+})
+
+
+(Trong bản bạn có rồi — nếu còn lỗi, kiểm tra nơi khác bạn có ghi nguyên rule mà chưa lọc _re.)
+
+6) Tóm tắt nhanh — các bước bạn làm ngay bây giờ
+
+Replace analyzer.py với file demo tôi đã post ở phần 2 (DEMO_MODE = True).
+
+Khởi động waf.py, backend_app.py, admin_api.py.
+
+Từ máy dev (PowerShell / bash) gửi 2 lần (DEMO) hoặc 3 lần (prod config) payload bị WAF chặn, ví dụ:
+
+curl "http://127.0.0.1:5000/search?q=UNION+SELECT+password+FROM+users"
+
+
+Kiểm tra logs/waf.log có dòng JSON BLOCKED không.
+
+Chạy python analyzer.py (hoặc click Run Analyzer trên admin UI / POST /api/analyze).
+
+Mở rules.json, kiểm tra rule mới.
