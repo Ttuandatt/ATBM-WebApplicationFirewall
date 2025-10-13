@@ -16,3 +16,5 @@ Vite sẽ serve tại http://localhost:5173 (hoặc port khác hiển thị lên
 Trong PyCharm:
 
 PyCharm Pro hỗ trợ Run Config cho npm; nếu bạn dùng PyCharm Community, mở terminal tích hợp và chạy npm run dev. Browser sẽ mở cổng Vite; UI sẽ fetch http://127.0.0.1:5002/api/....
+
+

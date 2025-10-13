@@ -424,6 +424,7 @@ Dưới đây là sơ đồ luồng hoạt động tổng thể trong project c�
 ```
 
 ### 🧠 5. Flask trong project RuleForge giúp ích như thế nào?
+```
 |          Mục tiêu          |	                    Flask đảm nhận                            |
 |---------------------------------------------------------------------------------------------|
 |    Xem danh sách rules     |      /api/rules đọc file rules.json, trả về JSON               |
@@ -431,7 +432,7 @@ Dưới đây là sơ đồ luồng hoạt động tổng thể trong project c�
 |    Chạy phân tích          |     	/api/analyze gọi analyzer.py sinh rule mới                |
 |  Giao tiếp với giao diện	 |      Cho phép admin-ui (HTML/JS) truy cập dữ liệu qua HTTP     |
 |      Bảo vệ CORS	         | Dùng flask_cors.CORS(app) cho phép frontend khác port truy cập |
-
+```
 
 ### 💡 6. Ví dụ cụ thể về hoạt động
 
@@ -763,3 +764,4 @@ curl -i "http://127.0.0.1:5000/search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 - Kiểm soát false positives: một vài rule (long token, cmd injection, xpath...) tốt nhất để enabled: false và chỉ log để phòng FP trong demo nếu backend giả lập có input hợp lệ.
 
 - Analyzer: nếu bạn muốn tự động sinh rule từ logs, chạy GET /api/analyze sau khi có nhiều BLOCK để xem nó thêm rule vào rules.json.
+
