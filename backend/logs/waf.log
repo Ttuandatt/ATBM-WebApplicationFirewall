@@ -189,3 +189,138 @@
 2025-10-12 13:25:14,899 [INFO]  * Restarting with watchdog (windowsapi)
 2025-10-12 13:25:15,359 [WARNING]  * Debugger is active!
 2025-10-12 13:25:15,361 [INFO]  * Debugger PIN: 103-039-434
+2025-10-13 18:28:48,334 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-13 18:28:48,334 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-13 18:28:48,336 [INFO]  * Restarting with stat
+2025-10-13 18:28:48,771 [WARNING]  * Debugger is active!
+2025-10-13 18:28:48,772 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-13T11:35:02.375315Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 18:35:02,375 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 18:35:04,453 [INFO] 127.0.0.1 - - [13/Oct/2025 18:35:04] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T11:35:14.318354Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 18:35:14,318 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 18:35:16,386 [INFO] 127.0.0.1 - - [13/Oct/2025 18:35:16] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T11:35:17.168541Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 18:35:17,168 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 18:35:19,233 [INFO] 127.0.0.1 - - [13/Oct/2025 18:35:19] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T11:35:19.988629Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 18:35:19,988 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 18:35:22,014 [INFO] 127.0.0.1 - - [13/Oct/2025 18:35:22] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T11:35:22.931513Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 18:35:22,931 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 18:35:24,985 [INFO] 127.0.0.1 - - [13/Oct/2025 18:35:24] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-10-13 18:39:55,722 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\analyzer.py', reloading
+2025-10-13 18:39:55,800 [INFO]  * Restarting with stat
+2025-10-13 18:39:56,284 [WARNING]  * Debugger is active!
+2025-10-13 18:39:56,285 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 18:40:24,221 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-13 18:40:24,222 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-13 18:40:24,222 [INFO] 127.0.0.1 - - [13/Oct/2025 18:40:24] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-13 18:40:32,274 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-13 18:40:32,274 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-13 18:40:32,274 [INFO] 127.0.0.1 - - [13/Oct/2025 18:40:32] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-13 18:40:33,218 [WARNING] BLOCKED [SQLi] (id=3): (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+2025-10-13 18:40:33,219 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-13 18:40:33,219 [INFO] 127.0.0.1 - - [13/Oct/2025 18:40:33] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-13 22:16:03,831 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-13 22:16:03,831 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-13 22:16:03,832 [INFO]  * Restarting with stat
+2025-10-13 22:16:04,278 [WARNING]  * Debugger is active!
+2025-10-13 22:16:04,280 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-13T15:16:21.174527Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:21,174 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:23,223 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:23] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:26.122944Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:26,123 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:28,149 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:28] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:28.983639Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:28,983 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:31,026 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:31] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:31.747418Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:31,747 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:33,814 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:33] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:34.888569Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:34,888 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:36,935 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:36] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:43.172225Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:43,172 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:45,239 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:45] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:16:45.951050Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:16:45,951 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:16:48,017 [INFO] 127.0.0.1 - - [13/Oct/2025 22:16:48] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:19:44.318367Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:19:44,318 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:19:46,386 [INFO] 127.0.0.1 - - [13/Oct/2025 22:19:46] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-10-13 22:20:40,803 [WARNING] BLOCKED [LFI] (id=5): (?:\.\./|/etc/passwd|/proc/self/environ) -- /test?cmd=cat%20/etc/passwd
+2025-10-13 22:20:40,803 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-13 22:20:40,804 [INFO] 127.0.0.1 - - [13/Oct/2025 22:20:40] "[31m[1mGET /test?cmd=cat%20/etc/passwd HTTP/1.1[0m" 403 -
+2025-10-13 22:21:00,597 [WARNING] BLOCKED [LFI] (id=5): (?:\.\./|/etc/passwd|/proc/self/environ) -- /test?cmd=cat%20/etc/passwd
+2025-10-13 22:21:00,598 [ERROR] Write json log error: Object of type Pattern is not JSON serializable
+2025-10-13 22:21:00,598 [INFO] 127.0.0.1 - - [13/Oct/2025 22:21:00] "[31m[1mGET /test?cmd=cat%20/etc/passwd HTTP/1.1[0m" 403 -
+{"timestamp": "2025-10-13T15:21:06.759735Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:21:06,760 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:21:08,776 [INFO] 127.0.0.1 - - [13/Oct/2025 22:21:08] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:21:59.522690Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:21:59,523 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:22:01,603 [INFO] 127.0.0.1 - - [13/Oct/2025 22:22:01] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+{"timestamp": "2025-10-13T15:22:02.569297Z", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": ""}
+2025-10-13 22:22:02,569 [INFO] ALLOWED 127.0.0.1 /search?q='%20OR%20'1'='1
+2025-10-13 22:22:04,642 [INFO] 127.0.0.1 - - [13/Oct/2025 22:22:04] "GET /search?q='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-10-13 22:30:08,427 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\waf.py', reloading
+2025-10-13 22:30:08,528 [INFO]  * Restarting with stat
+2025-10-13 22:30:09,010 [WARNING]  * Debugger is active!
+2025-10-13 22:30:09,012 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:30:35,514 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-13 22:30:35,514 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-13 22:30:35,515 [INFO]  * Restarting with stat
+2025-10-13 22:30:35,931 [WARNING]  * Debugger is active!
+2025-10-13 22:30:35,933 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:30:41,367 [WARNING] BLOCKED [SQLi] (id=3) : (?:union\s+select\b) -- /search?q=UNION+SELECT+password+FROM+users
+{"timestamp": "2025-10-13T15:30:41.367604+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q=UNION+SELECT+password+FROM+users", "payload_snippet": "/search q=UNION SELECT password FROM users", "matched_rule": {"id": 3, "type": "SQLi", "pattern": "(?:union\\s+select\\b)", "source": "seed"}}
+2025-10-13 22:30:41,371 [INFO] Analyzer triggered (background).
+2025-10-13 22:30:41,372 [INFO] 127.0.0.1 - - [13/Oct/2025 22:30:41] "[31m[1mGET /search?q=UNION+SELECT+password+FROM+users HTTP/1.1[0m" 403 -
+2025-10-13 22:30:50,558 [WARNING] BLOCKED [NEW_SQL_TAUTOLOGY]: pattern=(?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+ -- url=/search?q=%27+OR+%271%27%3d%271
+{"timestamp": "2025-10-13T15:30:50.558774+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q=%27+OR+%271%27%3d%271", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": null, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "live_detection"}}
+2025-10-13 22:30:50,559 [INFO] Analyzer trigger skipped due to debounce.
+2025-10-13 22:30:50,559 [INFO] 127.0.0.1 - - [13/Oct/2025 22:30:50] "[31m[1mGET /search?q='+OR+'1'%3d'1 HTTP/1.1[0m" 403 -
+2025-10-13 22:33:20,578 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\waf.py', reloading
+2025-10-13 22:33:20,689 [INFO]  * Restarting with stat
+2025-10-13 22:33:21,153 [WARNING]  * Debugger is active!
+2025-10-13 22:33:21,154 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:33:30,296 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-13 22:33:30,296 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-13 22:33:30,297 [INFO]  * Restarting with stat
+2025-10-13 22:33:30,727 [WARNING]  * Debugger is active!
+2025-10-13 22:33:30,728 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:33:32,513 [WARNING] BLOCKED [NEW_SQL_TAUTOLOGY]: pattern=(?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+ -- url=/search?q=%27+OR+%271%27%3d%271
+{"timestamp": "2025-10-13T15:33:32.513085+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q=%27+OR+%271%27%3d%271", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": null, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "live_detection"}}
+2025-10-13 22:33:32,517 [INFO] Analyzer triggered (background).
+2025-10-13 22:33:32,517 [INFO] 127.0.0.1 - - [13/Oct/2025 22:33:32] "[31m[1mGET /search?q='+OR+'1'%3d'1 HTTP/1.1[0m" 403 -
+2025-10-13 22:42:08,284 [WARNING] BLOCKED [SQL_TAUTOLOGY] (id=12) : (?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+ -- /search?q='%20OR%20'1'='1
+{"timestamp": "2025-10-13T15:42:08.284246+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": 12, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "auto_analyzer"}}
+2025-10-13 22:42:08,286 [INFO] Analyzer triggered (background).
+2025-10-13 22:42:08,286 [INFO] 127.0.0.1 - - [13/Oct/2025 22:42:08] "[31m[1mGET /search?q='%20OR%20'1'='1 HTTP/1.1[0m" 403 -
+2025-10-13 22:45:20,892 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\analyzer.py', reloading
+2025-10-13 22:45:20,925 [INFO]  * Restarting with stat
+2025-10-13 22:45:21,538 [WARNING]  * Debugger is active!
+2025-10-13 22:45:21,539 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:45:24,568 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\analyzer.py', reloading
+2025-10-13 22:45:24,604 [INFO]  * Restarting with stat
+2025-10-13 22:45:25,075 [WARNING]  * Debugger is active!
+2025-10-13 22:45:25,077 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:45:26,087 [INFO]  * Detected change in 'D:\\IT\\ATBM-WebApplicationFirewall\\backend\\analyzer.py', reloading
+2025-10-13 22:45:26,131 [INFO]  * Restarting with stat
+2025-10-13 22:45:26,595 [WARNING]  * Debugger is active!
+2025-10-13 22:45:26,596 [INFO]  * Debugger PIN: 253-374-819
+2025-10-13 22:45:31,563 [WARNING] BLOCKED [SQL_TAUTOLOGY] (id=12) : (?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+ -- /search?q='%20OR%20'1'='1
+{"timestamp": "2025-10-13T15:45:31.563500+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": 12, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "auto_analyzer"}}
+2025-10-13 22:45:31,569 [INFO] Analyzer triggered (background).
+2025-10-13 22:45:31,569 [INFO] 127.0.0.1 - - [13/Oct/2025 22:45:31] "[31m[1mGET /search?q='%20OR%20'1'='1 HTTP/1.1[0m" 403 -
+2025-10-13 22:45:39,707 [WARNING] BLOCKED [SQL_TAUTOLOGY] (id=12) : (?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+ -- /search?q='%20OR%20'1'='1
+{"timestamp": "2025-10-13T15:45:39.707240+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": 12, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "auto_analyzer"}}
+2025-10-13 22:45:39,707 [INFO] Analyzer trigger skipped due to debounce.
+2025-10-13 22:45:39,707 [INFO] 127.0.0.1 - - [13/Oct/2025 22:45:39] "[31m[1mGET /search?q='%20OR%20'1'='1 HTTP/1.1[0m" 403 -

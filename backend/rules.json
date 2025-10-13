@@ -78,5 +78,21 @@
     "enabled": false,
     "source": "seed",
     "comment": "Phát hiện tham số redirect chứa external URL (có thể gây open redirect). Disabled mặc định — có thể dùng để log/alert thay vì block."
+  },
+  {
+    "id": 11,
+    "type": "regex",
+    "pattern": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)",
+    "enabled": true,
+    "source": "auto_analyzer",
+    "comment": "Tự sinh từ logs (2 lần / 1 IP)"
+  },
+  {
+    "id": 12,
+    "type": "SQL_TAUTOLOGY",
+    "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+",
+    "enabled": true,
+    "source": "auto_analyzer",
+    "comment": "Tự sinh từ logs (2 lần / 1 IP)"
   }
 ]
