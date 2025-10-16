@@ -324,3 +324,61 @@
 {"timestamp": "2025-10-13T15:45:39.707240+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/search?q='%20OR%20'1'='1", "payload_snippet": "/search q=' OR '1'='1", "matched_rule": {"id": 12, "type": "SQL_TAUTOLOGY", "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+", "source": "auto_analyzer"}}
 2025-10-13 22:45:39,707 [INFO] Analyzer trigger skipped due to debounce.
 2025-10-13 22:45:39,707 [INFO] 127.0.0.1 - - [13/Oct/2025 22:45:39] "[31m[1mGET /search?q='%20OR%20'1'='1 HTTP/1.1[0m" 403 -
+2025-10-16 10:43:13,979 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-16 10:43:13,979 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-16 10:43:13,979 [INFO]  * Restarting with stat
+2025-10-16 10:43:14,355 [WARNING]  * Debugger is active!
+2025-10-16 10:43:14,375 [INFO]  * Debugger PIN: 258-407-148
+{"timestamp": "2025-10-16T03:49:49.002170+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:49:49,002 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:49:51,100 [INFO] 127.0.0.1 - - [16/Oct/2025 10:49:51] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-16T03:49:57.374893+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:49:57,374 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:49:59,405 [INFO] 127.0.0.1 - - [16/Oct/2025 10:49:59] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-16T03:50:00.015793+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:50:00,015 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:50:02,120 [INFO] 127.0.0.1 - - [16/Oct/2025 10:50:02] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-16T03:50:02.651291+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:50:02,651 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:50:04,745 [INFO] 127.0.0.1 - - [16/Oct/2025 10:50:04] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-16T03:50:05.272857+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:50:05,272 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:50:07,325 [INFO] 127.0.0.1 - - [16/Oct/2025 10:50:07] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+{"timestamp": "2025-10-16T03:50:07.782577+00:00", "event": "ALLOWED", "src_ip": "127.0.0.1", "url": "/search?q=filter=(//*%20)[1]", "payload_snippet": ""}
+2025-10-16 10:50:07,782 [INFO] ALLOWED 127.0.0.1 /search?q=filter=(//*%20)[1]
+2025-10-16 10:50:09,809 [INFO] 127.0.0.1 - - [16/Oct/2025 10:50:09] "GET /search?q=filter=(//*%20)[1] HTTP/1.1" 200 -
+2025-10-16 10:51:20,380 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /comment
+{"timestamp": "2025-10-16T03:51:20.378031+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "/comment  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
+2025-10-16 10:51:20,390 [INFO] Analyzer triggered (background).
+2025-10-16 10:51:20,398 [INFO] 127.0.0.1 - - [16/Oct/2025 10:51:20] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-16 10:51:26,515 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /comment
+{"timestamp": "2025-10-16T03:51:26.515581+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "/comment  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
+2025-10-16 10:51:26,515 [INFO] Analyzer trigger skipped due to debounce.
+2025-10-16 10:51:26,515 [INFO] 127.0.0.1 - - [16/Oct/2025 10:51:26] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-16 10:52:06,605 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /
+{"timestamp": "2025-10-16T03:52:06.605038+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/", "payload_snippet": "/  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
+2025-10-16 10:52:06,605 [INFO] Analyzer triggered (background).
+2025-10-16 10:52:06,605 [INFO] 127.0.0.1 - - [16/Oct/2025 10:52:06] "[31m[1mPOST / HTTP/1.1[0m" 403 -
+2025-10-16 10:57:52,326 [INFO]  * Detected change in 'C:\\Users\\ACER\\Dropbox\\My PC (LAPTOP-UGP9QJUT)\\Documents\\ITstudies\\ATBM_Truong Tan Khoa\\ATBM-WebApplicationFirewall\\backend\\waf.py', reloading
+2025-10-16 10:57:52,706 [INFO]  * Restarting with stat
+2025-10-16 10:57:53,566 [WARNING]  * Debugger is active!
+2025-10-16 10:57:53,578 [INFO]  * Debugger PIN: 258-407-148
+2025-10-16 10:57:56,657 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-16 10:57:56,657 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-16 10:57:56,657 [INFO]  * Restarting with stat
+2025-10-16 10:57:57,088 [WARNING]  * Debugger is active!
+2025-10-16 10:57:57,096 [INFO]  * Debugger PIN: 258-407-148
+2025-10-16 10:58:00,999 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /
+2025-10-16 10:58:01,014 [INFO] Analyzer triggered (background).
+2025-10-16 10:58:01,016 [INFO] 127.0.0.1 - - [16/Oct/2025 10:58:01] "[31m[1mPOST / HTTP/1.1[0m" 403 -
+2025-10-16 10:58:02,710 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /
+2025-10-16 10:58:02,710 [INFO] Analyzer trigger skipped (debounce).
+2025-10-16 10:58:02,710 [INFO] 127.0.0.1 - - [16/Oct/2025 10:58:02] "[31m[1mPOST / HTTP/1.1[0m" 403 -
+2025-10-16 11:03:35,889 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-16 11:03:35,889 [INFO] Analyzer triggered (background).
+2025-10-16 11:03:35,900 [INFO] 127.0.0.1 - - [16/Oct/2025 11:03:35] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-16 11:03:42,119 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /comment
+2025-10-16 11:03:42,121 [INFO] Analyzer trigger skipped (debounce).
+2025-10-16 11:03:42,121 [INFO] 127.0.0.1 - - [16/Oct/2025 11:03:42] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
