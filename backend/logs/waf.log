@@ -382,3 +382,10 @@
 2025-10-16 11:03:42,119 [WARNING] BLOCKED [XSS] (id=1) : <script[^>]*?>[\s\S]*?<\/script> -- /comment
 2025-10-16 11:03:42,121 [INFO] Analyzer trigger skipped (debounce).
 2025-10-16 11:03:42,121 [INFO] 127.0.0.1 - - [16/Oct/2025 11:03:42] "[31m[1mPOST /comment HTTP/1.1[0m" 403 -
+2025-10-16 16:11:04,465 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-16 16:11:04,465 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-16 16:11:04,466 [INFO]  * Restarting with stat
+2025-10-16 16:11:04,896 [WARNING]  * Debugger is active!
+2025-10-16 16:11:04,901 [INFO]  * Debugger PIN: 253-374-819
+{"timestamp": "2025-10-19T15:47:48.828855", "event": "BLOCKED", "src_ip": "127.0.0.1", "path": "/search", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "enabled": true, "source": "seed", "comment": "Chặn payload XSS dạng <script>...</script>. Dùng để phát hiện script tag trực tiếp trong body/query. (FP risk: thấp nếu đã decode input)."}}
