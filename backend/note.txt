@@ -422,3 +422,12 @@ Kiểm tra logs/waf.log có dòng JSON BLOCKED không.
 Chạy python analyzer.py (hoặc click Run Analyzer trên admin UI / POST /api/analyze).
 
 Mở rules.json, kiểm tra rule mới.
+
+19/10/2025
+Commit message cho các thay đổi gần đây:
+- Thêm file show_structure.py để in ra cấu trúc project cho dễ chatgpt
+- feat(ml): integrate machine learning model for intelligent attack detection
+    - Added `ml_model.py` with TF-IDF + LogisticRegression
+    - Added `train_ml.py` for initial dataset training
+    - Updated `waf.py` to call ML model for live detection
+    - Enabled UTF-8 stdout in analyzer to avoid encoding issues
