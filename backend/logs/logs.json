@@ -1,4 +1,26 @@
-{"timestamp": "2025-10-16T03:58:00.999776+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/", "payload_snippet": "/  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
-{"timestamp": "2025-10-16T03:58:02.710202+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/", "payload_snippet": "/  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
-{"timestamp": "2025-10-16T04:03:35.889035+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "/comment  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
-{"timestamp": "2025-10-16T04:03:42.119447+00:00", "event": "BLOCKED", "src_ip": "127.0.0.1", "url": "/comment", "payload_snippet": "/comment  <script>alert('xss')</script>", "matched_rule": {"id": 1, "type": "XSS", "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>", "source": "seed"}}
+[
+  {
+    "timestamp": "2025-10-20T14:25:31",
+    "src_ip": "192.168.1.10",
+    "request": "GET /index.html",
+    "event": "ALLOWED"
+  },
+  {
+    "timestamp": "2025-10-20T14:25:40",
+    "src_ip": "192.168.1.11",
+    "request": "GET /search?q=' OR '1'='1",
+    "event": "BLOCKED"
+  },
+  {
+    "timestamp": "2025-10-20T14:26:02",
+    "src_ip": "192.168.1.12",
+    "request": "<script>alert('hacked')</script>",
+    "event": "BLOCKED"
+  },
+  {
+    "timestamp": "2025-10-20T14:27:00",
+    "src_ip": "192.168.1.13",
+    "request": "GET /about",
+    "event": "ALLOWED"
+  }
+]
