@@ -18,7 +18,11 @@ def print_tree(start_path, prefix=""):
 
 if __name__ == "__main__":
     # 🔹 Đường dẫn gốc đến project của bạn
+    # PC
     root_dir = r"D:\IT\ATBM-WebApplicationFirewall"
+    # Laptop
+    root_dir = r"C:\\Users\\ACER\\Dropbox\\My PC (LAPTOP-UGP9QJUT)\\Documents\\ITstudies\\ATBM_Truong Tan Khoa\\ATBM-WebApplicationFirewall"
+
 
     if not os.path.exists(root_dir):
         print(f"❌ Thư mục '{root_dir}' không tồn tại.")
