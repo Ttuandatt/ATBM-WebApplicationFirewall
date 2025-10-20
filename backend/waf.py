@@ -1,227 +1,150 @@
-# waf.py (modified)
-from flask import Flask, request, Response, jsonify
-import requests, json, logging, os, re, threading, subprocess, time
-from datetime import datetime, timezone
-from urllib.parse import unquote_plus
+# waf.py
+import os
+import re
+import json
+import time
+import logging
+from datetime import datetime
+from flask import Flask, request, jsonify
+from ml_model import predict
 
 app = Flask(__name__)
 
-BACKEND_URL = "http://localhost:5001"
-RULES_FILE = "rules.json"
-LOGFILE = os.path.join("logs", "waf.log")
-ANALYZER_SCRIPT = os.path.join(os.path.dirname(__file__), "analyzer.py")
-ANALYZER_OUT = os.path.join("logs", "analyzer.out")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RULES_FILE = os.path.join(BASE_DIR, "rules.json")
+LOG_FILE = os.path.join(BASE_DIR, "logs", "waf.log")
 
-# cấu hình log
-os.makedirs("logs", exist_ok=True)
-logging.basicConfig(filename=LOGFILE, level=logging.INFO,
-                    format="%(asctime)s [%(levelname)s] %(message)s")
+# Setup logging (text-based)
+logging.basicConfig(
+    filename=os.path.join(BASE_DIR, "logs", "backend.log"),
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
-# Debounce / throttle params cho gọi analyzer
-DEBOUNCE_SEC = 10
-_last_analyzer_trigger = 0
-_analyzer_lock = threading.Lock()
-
-# ==================== Tiện ích ====================
-def load_rules_file(path=RULES_FILE):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            rules = json.load(f)
-    except Exception as e:
-        logging.error(f"Failed to load rules: {e}")
+# =========================================================
+# Utilities
+# =========================================================
+def load_rules():
+    """Load rules.json into memory"""
+    if not os.path.exists(RULES_FILE):
         return []
-
-    compiled = []
-    for r in rules:
+    with open(RULES_FILE, "r", encoding="utf-8") as f:
         try:
-            patt = r.get("pattern", "")
-            r["_re"] = re.compile(patt, re.I | re.S)
+            return json.load(f)
         except Exception as e:
-            logging.error(f"Regex compile error for pattern '{r.get('pattern')}': {e}")
-            r["_re"] = None
-        compiled.append(r)
-    return compiled
+            logging.error(f"Failed to load rules.json: {e}")
+            return []
 
-def normalize_content(s: str) -> str:
-    try:
-        s2 = unquote_plus(s)
-    except Exception:
-        s2 = s
-    return s2.strip()
-
-def safe_matched_rule_for_log(rule):
-    """
-    Trả về dict serializable cho matched_rule (loại bỏ object không serialize được như Pattern)
-    """
-    if not rule:
-        return {}
-    # keep only keys that are JSON-serializable primitive types
-    keys = ["id", "type", "pattern", "source"]
-    out = {}
-    for k in keys:
-        if k in rule:
-            out[k] = rule[k]
-    return out
-
-def append_json_log(entry: dict):
-    try:
-        with open(LOGFILE, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    except Exception as e:
-        logging.error(f"Write json log error: {e}")
-
-# ==================== Analyzer trigger (debounced) ====================
-def trigger_analyzer_async():
-    """
-    Debounced async trigger: nếu lần trigger trước chưa quá DEBOUNCE_SEC giây,
-    thì bỏ qua. Ngược lại spawn analyzer.py bằng subprocess Popen (non-blocking).
-    """
-    global _last_analyzer_trigger
-    now = time.time()
-    with _analyzer_lock:
-        if now - _last_analyzer_trigger < DEBOUNCE_SEC:
-            logging.info("Analyzer trigger skipped due to debounce.")
-            return
-        _last_analyzer_trigger = now
-
-    try:
-        # spawn analyzer in background, redirect stdout/stderr to a file
-        with open(ANALYZER_OUT, "a", encoding="utf-8") as out:
-            subprocess.Popen(["python", ANALYZER_SCRIPT], cwd=os.path.dirname(ANALYZER_SCRIPT),
-                             stdout=out, stderr=out)
-        logging.info("Analyzer triggered (background).")
-    except Exception as e:
-        logging.error(f"Failed to trigger analyzer: {e}")
-
-# ==================== Heuristic Attack Detection ====================
-# dùng để chặn tấn công mới chưa có rule
-def detect_suspicious_payload(content):
-    # bổ sung SQL tautology / boolean injection nhỏ để demo
-    patterns = [
-        # SQLi common keywords
-        (r"(?:'|\")?\s*(UNION|SELECT|INSERT|UPDATE|DELETE)\s+.*\s+FROM", "SQLI_LIVE"),
-        # SQL tautology e.g. ' or '1'='1 or " or 1=1
-        (r"(?i)(?:\bor\b|\bor\b).{0,10}?[\d'\"`]+\s*=\s*[\d'\"`]+", "SQL_TAUTOLOGY"),
-        # XSS
-        (r"<script.*?>.*?</script>", "XSS_LIVE"),
-        (r"onerror\s*=", "XSS_LIVE"),
-        (r"javascript:", "XSS_LIVE"),
-        # LFI / RFI
-        (r"\.\./", "PATH_TRAVERSAL"),
-        # Dangerous file upload
-        (r"\.(php|phtml|jsp|asp|aspx)\b", "SUSPICIOUS_FILE")
-    ]
-
-    for patt, ptype in patterns:
-        try:
-            if re.search(patt, content, re.I | re.S):
-                return ptype, patt
-        except re.error:
-            # skip bad regex
-            continue
-    return None, None
-
-# ==================== WAF core ====================
-@app.before_request
-def waf_filter():
-    rules = load_rules_file(RULES_FILE)
-
-    path = request.path or ""
-    query = request.query_string.decode() or ""
-    body = request.get_data(as_text=True) or ""
-    src_ip = request.remote_addr or ""
-    url = path + (("?" + query) if query else "")
-    content = normalize_content(f"{path} {query} {body}")
-
-    # (1) Kiểm tra rule có sẵn
-    for rule in rules:
-        if not rule.get("enabled", False):
-            continue
-        reobj = rule.get("_re")
-        if reobj and reobj.search(content):
-            timestamp = datetime.now(timezone.utc).isoformat()
-            logging.warning(f"BLOCKED [{rule['type']}] (id={rule.get('id')}) : {rule.get('pattern')} -- {url}")
-
-            # append log with safe matched_rule (no Pattern objects)
-            append_json_log({
-                "timestamp": timestamp,
-                "event": "BLOCKED",
-                "src_ip": src_ip,
-                "url": url,
-                "payload_snippet": content[:300],
-                "matched_rule": safe_matched_rule_for_log(rule)
-            })
-
-            # trigger analyzer in background (debounced)
-            trigger_analyzer_async()
-
-            return jsonify({
-                "message": f"Blocked by WAF (rule {rule.get('id')})",
-                "rule": {"id": rule.get('id'), "type": rule.get('type')}
-            }), 403
-
-    # (2) Phát hiện tấn công mới chưa có rule (live detection)
-    attack_type, patt = detect_suspicious_payload(content)
-    if attack_type:
-        timestamp = datetime.now(timezone.utc).isoformat()
-        logging.warning(f"BLOCKED [NEW_{attack_type}]: pattern={patt} -- url={url}")
-
-        matched = {
-            "id": None,
-            "type": attack_type,
-            "pattern": patt,
-            "source": "live_detection"
-        }
-
-        append_json_log({
-            "timestamp": timestamp,
-            "event": "BLOCKED",
-            "src_ip": src_ip,
-            "url": url,
-            "payload_snippet": content[:300],
-            "matched_rule": matched
-        })
-
-        # trigger analyzer async (debounced)
-        trigger_analyzer_async()
-
-        return jsonify({
-            "message": f"Blocked instantly (detected {attack_type})",
-            "rule": {"type": attack_type, "pattern": patt}
-        }), 403
-
-    # (3) Nếu hợp lệ -> forward (proxy)
-    timestamp = datetime.now(timezone.utc).isoformat()
-    append_json_log({
-        "timestamp": timestamp,
-        "event": "ALLOWED",
+def log_event(event_type, src_ip, path, details):
+    """Append event to waf.log (both plain and JSON format)"""
+    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+    data = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "event": event_type,
         "src_ip": src_ip,
-        "url": url,
-        "payload_snippet": (body or "")[:300]
-    })
-    logging.info(f"ALLOWED {src_ip} {url}")
+        "path": path,
+        **details
+    }
+    # log JSON
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(data, ensure_ascii=False) + "\n")
+    # human-readable line
+    logging.info(f"{event_type} from {src_ip} at {path}: {details}")
+
+def block_response():
+    """Return a 403 block message"""
+    return jsonify({
+        "status": "blocked",
+        "message": "Request blocked by Web Application Firewall."
+    }), 403
+
+# =========================================================
+# Detection
+# =========================================================
+def match_rules(text, rules):
+    """Kiểm tra text có match rule nào không"""
+    for rule in rules:
+        if not rule.get("enabled", True):
+            continue
+        ptype = rule.get("type")
+        patt = rule.get("pattern")
+        if not ptype or not patt:
+            continue
+        try:
+            if re.search(patt, text, re.IGNORECASE):
+                return rule
+        except re.error as e:
+            logging.error(f"Invalid regex in rule {rule.get('id')}: {e}")
     return None
 
-@app.route("/", defaults={"path": ""}, methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
-@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
-def proxy(path):
+def inspect_request(req):
+    """Phân tích nội dung request (URL + body)"""
+    text_parts = [req.path, req.query_string.decode("utf-8", errors="ignore")]
     try:
-        resp = requests.request(
-            method=request.method,
-            url=f"{BACKEND_URL}/{path}",
-            headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
-            params=request.args,
-            data=request.get_data(),
-            cookies=request.cookies,
-            allow_redirects=False,
-            timeout=10
-        )
-    except requests.RequestException:
-        return Response("Backend error", status=502)
+        if req.data:
+            text_parts.append(req.data.decode("utf-8", errors="ignore"))
+    except Exception:
+        pass
+    full_text = " ".join(text_parts)
+    return full_text
 
-    excluded_headers = {"content-encoding", "content-length", "transfer-encoding", "connection"}
-    response_headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers] if hasattr(resp, "raw") else resp.headers.items()
-    return Response(resp.content, status=resp.status_code, headers=response_headers)
+# =========================================================
+# Flask routes
+# =========================================================
+@app.before_request
+def waf_filter():
+    """Middleware kiểm tra tất cả request"""
+    src_ip = request.remote_addr
+    path = request.path
+    rules = load_rules()
+    text = inspect_request(request)
 
+    # --- Rule-based detection ---
+    matched_rule = match_rules(text, rules)
+    if matched_rule:
+        log_event("BLOCKED", src_ip, path, {"matched_rule": matched_rule})
+        return block_response()
+
+    # --- ML-based detection ---
+    try:
+        pred, prob = predict(text)
+        if pred == 1:
+            ml_rule = {
+                "type": "ML_MODEL",
+                "pattern": f"prob={prob:.2f}",
+                "enabled": True,
+                "source": "ml_model"
+            }
+            log_event("ML_BLOCKED", src_ip, path, {"matched_rule": ml_rule})
+            return block_response()
+    except FileNotFoundError:
+        # Model chưa train -> bỏ qua
+        pass
+    except Exception as e:
+        logging.error(f"ML detection error: {e}")
+
+    # nếu không bị chặn
+    log_event("ALLOWED", src_ip, path, {"info": "passed"})
+    return None  # cho phép tiếp tục
+
+@app.route("/")
+def index():
+    return jsonify({
+        "message": "WAF is active and monitoring traffic",
+        "status": "running"
+    })
+
+@app.route("/test", methods=["GET", "POST"])
+def test_page():
+    return jsonify({
+        "message": "This is a test page.",
+        "method": request.method,
+        "args": request.args,
+        "data": request.data.decode("utf-8", errors="ignore")
+    })
+
+# =========================================================
+# Run
+# =========================================================
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

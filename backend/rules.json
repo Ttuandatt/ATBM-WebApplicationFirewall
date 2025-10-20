@@ -93,6 +93,6 @@
     "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+",
     "enabled": true,
     "source": "auto_analyzer",
-    "comment": "Tự sinh từ logs (2 lần / 1 IP)"
+    "comment": "Tự sinh từ logs (5 lần / 1 IP)"
   }
 ]
