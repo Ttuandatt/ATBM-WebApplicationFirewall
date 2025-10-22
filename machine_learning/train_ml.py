@@ -1,18 +1,13 @@
 # backend/train_ml.py
+import os
 from ml_model import train_model
 
-train_samples = [
-    ("normal", "GET /index.html"),
-    ("normal", "GET /login?username=admin"),
-    ("normal", "POST /submit-feedback message=hello"),
-    ("attack", "GET /search?q=' OR '1'='1"),
-    ("attack", "<script>alert('xss')</script>"),
-    ("attack", "../../etc/passwd"),
-    ("attack", "UNION SELECT password FROM users"),
-    ("normal", "GET /about-us"),
-    ("attack", "GET /product?id=1; DROP TABLE users"),
-    ("normal", "GET /static/js/main.js")
-]
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGS_CSV = os.path.join(BASE_DIR, "backend", "logs", "log2.csv")
 
 if __name__ == "__main__":
-    train_model(train_samples)
+    if not os.path.exists(LOGS_CSV):
+        raise FileNotFoundError(f"{LOGS_CSV} not found.")
+
+    print(f"[INFO] Đang đọc dữ liệu từ {LOGS_CSV} ...")
+    train_model()
