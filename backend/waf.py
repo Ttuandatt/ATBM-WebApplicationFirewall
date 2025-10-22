@@ -9,7 +9,6 @@ import logging
 import threading
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
-from machine_learning.ml_model import predict_request, train_model  # cập nhật import
 from machine_learning.ml_model import predict_request, train_model
 
 app = Flask(__name__)

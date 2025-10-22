@@ -1,0 +1,2 @@
+20/10/2025 (tuandat):
+- Thêm file log2.csv chứa các network logs, lấy từ https://www.kaggle.com/datasets/tunguz/internet-firewall-data-set/data

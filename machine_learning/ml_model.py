@@ -1,59 +1,71 @@
 # machine_learning/ml_model.py
 import os
-import json
 import joblib
 import logging
-from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
-import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(BASE_DIR, "machine_learning")
-LOGS_FILE = os.path.join(BASE_DIR, "logs.json")
+BACKEND_DIR = os.path.join(BASE_DIR, "backend")
+LOGS_DIR = os.path.join(BACKEND_DIR, "logs")
+
+LOGS_CSV = os.path.join(LOGS_DIR, "log2.csv")
 
 MODEL_PATH = os.path.join(MODEL_DIR, "model_xgb.pkl")
-VECTORIZER_PATH = os.path.join(MODEL_DIR, "vectorizer.pkl")
+
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 logging.basicConfig(
-    filename=os.path.join(BASE_DIR, "logs", "ml_train.log"),
+    filename=os.path.join(LOGS_DIR, "ml_train.log"),
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
+
 # =========================================================
 # Utility
 # =========================================================
-def load_logs():
-    """Load dữ liệu huấn luyện từ logs.json"""
-    if not os.path.exists(LOGS_FILE):
-        raise FileNotFoundError(f"{LOGS_FILE} not found.")
-    with open(LOGS_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    texts = [x["text"] for x in data]
-    labels = [x["label"] for x in data]
-    return texts, labels
+def load_logs_csv():
+    """Đọc backend/logs/log2.csv và trả về X (features), y (labels)."""
+    if not os.path.exists(LOGS_CSV):
+        raise FileNotFoundError(f"{LOGS_CSV} not found.")
+
+    df = pd.read_csv(LOGS_CSV)
+    if "Action" not in df.columns:
+        raise ValueError("CSV file must contain 'Action' column.")
+
+    # Gán nhãn 1 = blocked, 0 = allow
+    df["Action"] = df["Action"].str.lower().map({"allow": 0, "block": 1, "blocked": 1})
+    df["Action"].fillna(0, inplace=True)
+
+    y = df["Action"]
+    X = df.drop(columns=["Action"])  # dùng các cột số còn lại
+
+    # Ép các cột còn lại thành kiểu số
+    X = X.apply(pd.to_numeric, errors="coerce").fillna(0)
+    return X, y
+
 
 # =========================================================
 # Train Model
 # =========================================================
 def train_model():
-    """Huấn luyện XGBoost model từ logs.json"""
-    logging.info("🚀 Bắt đầu huấn luyện mô hình XGBoost...")
-    texts, labels = load_logs()
+    """Huấn luyện XGBoost từ log2.csv"""
+    logging.info("🚀 Bắt đầu huấn luyện mô hình XGBoost (từ log2.csv)...")
 
-    vectorizer = TfidfVectorizer(max_features=500)
-    X = vectorizer.fit_transform(texts)
-    y = np.array(labels)
+    X, y = load_logs_csv()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     model = XGBClassifier(
-        n_estimators=120,
-        max_depth=4,
+        n_estimators=100,
+        max_depth=5,
         learning_rate=0.1,
         subsample=0.8,
+        colsample_bytree=0.8,
         eval_metric="logloss",
         use_label_encoder=False
     )
@@ -63,23 +75,30 @@ def train_model():
     acc = accuracy_score(y_test, preds)
 
     joblib.dump(model, MODEL_PATH)
-    joblib.dump(vectorizer, VECTORIZER_PATH)
-
     logging.info(f"✅ Huấn luyện hoàn tất — Độ chính xác: {acc:.2f}")
     print(f"[ML] Model trained — Accuracy: {acc:.2f}")
+
 
 # =========================================================
 # Predict
 # =========================================================
-def predict_request(text: str):
-    """Dự đoán xem request có tấn công không (1 = Attack, 0 = Safe)"""
-    if not os.path.exists(MODEL_PATH) or not os.path.exists(VECTORIZER_PATH):
+def predict_request(features: dict):
+    """
+    Dự đoán xem một request có phải tấn công không.
+    Input: dict gồm các trường giống log2.csv
+    Output: (label, prob)
+    """
+    if not os.path.exists(MODEL_PATH):
         raise FileNotFoundError("Model chưa được huấn luyện. Hãy chạy train_model().")
 
     model = joblib.load(MODEL_PATH)
-    vectorizer = joblib.load(VECTORIZER_PATH)
 
-    X = vectorizer.transform([text])
-    prob = model.predict_proba(X)[0][1]
+    # Chuyển dict thành dataframe 1 dòng
+    df = pd.DataFrame([features])
+
+    # Đảm bảo các cột khớp với dữ liệu huấn luyện
+    df = df.apply(pd.to_numeric, errors="coerce").fillna(0)
+
+    prob = model.predict_proba(df)[0][1]
     pred = int(prob > 0.5)
     return pred, float(prob)
