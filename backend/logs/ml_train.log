@@ -1,0 +1,71 @@
+2025-10-20 23:21:55,127 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-20 23:21:55,127 [INFO] [33mPress CTRL+C to quit[0m
+2025-10-20 23:21:55,130 [INFO]  * Restarting with stat
+2025-10-20 23:21:56,574 [WARNING]  * Debugger is active!
+2025-10-20 23:21:56,581 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:52:18,930 [INFO]  * Detected change in 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\machine_learning\\ml_model.py', reloading
+2025-10-21 22:52:19,385 [INFO]  * Restarting with stat
+2025-10-21 22:52:27,789 [WARNING]  * Debugger is active!
+2025-10-21 22:52:27,794 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:53:44,027 [INFO] \U0001f680 Start ML training...
+2025-10-21 22:55:40,012 [INFO]  * Detected change in 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\machine_learning\\ml_model.py', reloading
+2025-10-21 22:55:40,158 [INFO]  * Restarting with stat
+2025-10-21 22:55:41,736 [WARNING]  * Debugger is active!
+2025-10-21 22:55:41,742 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:55:50,817 [INFO]  * Detected change in 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\machine_learning\\ml_model.py', reloading
+2025-10-21 22:55:50,976 [INFO]  * Restarting with stat
+2025-10-21 22:55:52,478 [WARNING]  * Debugger is active!
+2025-10-21 22:55:52,483 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:55:57,880 [INFO] \U0001f680 Start ML training...
+2025-10-21 22:56:19,672 [INFO]  * Detected change in 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\machine_learning\\ml_model.py', reloading
+2025-10-21 22:56:19,861 [INFO]  * Restarting with stat
+2025-10-21 22:56:21,610 [WARNING]  * Debugger is active!
+2025-10-21 22:56:21,615 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:56:22,641 [INFO]  * Detected change in 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\machine_learning\\ml_model.py', reloading
+2025-10-21 22:56:22,765 [INFO]  * Restarting with stat
+2025-10-21 22:56:24,312 [WARNING]  * Debugger is active!
+2025-10-21 22:56:24,319 [INFO]  * Debugger PIN: 745-356-890
+2025-10-21 22:56:27,682 [INFO] \U0001f680 Start ML training...
+2025-10-21 22:56:27,683 [INFO] Loaded 4 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\logs.json (raw WAF format).
+2025-10-21 22:57:40,320 [INFO] \U0001f680 Start ML training...
+2025-10-21 22:57:40,344 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\logs.json (ML format).
+2025-10-21 22:57:40,468 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:01:56,165 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:01:56,255 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\logs.json (ML format).
+2025-10-22 22:01:56,382 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:05:34,396 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:05:34,397 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:05:34,484 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:05:56,737 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:05:56,738 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:05:56,807 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:10:25,460 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:10:25,461 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:10:25,533 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:27:25,674 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:27:25,691 [INFO] Loaded 70 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:27:25,769 [INFO] \u2705 Training complete — Accuracy: 0.786 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:37:56,074 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:37:56,296 [WARNING] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv as ML format: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:37:56,296 [ERROR] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:38:16,760 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:38:16,777 [WARNING] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv as ML format: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:38:16,777 [ERROR] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:40:52,717 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:40:52,745 [WARNING] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv as ML format: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:40:52,745 [ERROR] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:42:17,066 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:43:22,225 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:43:22,244 [WARNING] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv as ML format: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:44:25,348 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:44:25,350 [INFO] Loaded 69 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:44:25,425 [INFO] \u2705 Training complete — Accuracy: 0.714 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:48:18,276 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:48:18,294 [WARNING] Failed to load E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv as ML format: [Errno 22] Invalid argument: 'E:\\Learn\\Code_2\\ATBM-WebApplicationFirewall\\backend\\logs\\dataset.csv'
+2025-10-22 22:49:41,856 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:49:41,878 [INFO] Loaded 70 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:49:41,991 [INFO] \u2705 Training complete — Accuracy: 0.786 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
+2025-10-22 22:51:18,064 [INFO] \U0001f680 Start ML training...
+2025-10-22 22:51:18,081 [INFO] Loaded 71 records from E:\Learn\Code_2\ATBM-WebApplicationFirewall\backend\logs\dataset.csv (ML format).
+2025-10-22 22:51:18,149 [INFO] \u2705 Training complete — Accuracy: 0.867 — Saved model to E:\Learn\Code_2\ATBM-WebApplicationFirewall\machine_learning\model_xgb.pkl
