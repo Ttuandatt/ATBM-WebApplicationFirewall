@@ -37,9 +37,14 @@ def load_logs_csv():
     if "Action" not in df.columns:
         raise ValueError("CSV file must contain 'Action' column.")
 
-    # Gán nhãn 1 = blocked, 0 = allow
-    df["Action"] = df["Action"].str.lower().map({"allow": 0, "block": 1, "blocked": 1})
-    df["Action"].fillna(0, inplace=True)
+    # Gán nhãn 1 = deny, 0 = allow
+    df["Action"] = (
+        df["Action"].astype(str)
+        .str.lower()
+        .map({"allow": 0, "deny": 1, "drop": 1})
+    )
+    df["Action"] = df["Action"].fillna(0)
+    df["Action"] = df["Action"].astype(int)
 
     y = df["Action"]
     X = df.drop(columns=["Action"])  # dùng các cột số còn lại
@@ -67,7 +72,6 @@ def train_model():
         subsample=0.8,
         colsample_bytree=0.8,
         eval_metric="logloss",
-        use_label_encoder=False
     )
 
     model.fit(X_train, y_train)
