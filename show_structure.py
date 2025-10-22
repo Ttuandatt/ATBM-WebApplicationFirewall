@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # PC
     root_dir = r"D:\IT\ATBM-WebApplicationFirewall"
     # Laptop
-    root_dir = r"C:\\Users\\ACER\\Dropbox\\My PC (LAPTOP-UGP9QJUT)\\Documents\\ITstudies\\ATBM_Truong Tan Khoa\\ATBM-WebApplicationFirewall"
+    # root_dir = r"C:\\Users\\ACER\\Dropbox\\My PC (LAPTOP-UGP9QJUT)\\Documents\\ITstudies\\ATBM_Truong Tan Khoa\\ATBM-WebApplicationFirewall"
 
 
     if not os.path.exists(root_dir):

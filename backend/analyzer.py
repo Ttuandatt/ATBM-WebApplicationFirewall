@@ -65,7 +65,7 @@ def save_rules(rules):
 
 
 def candidate_pattern_from_snippet(snippet: str, max_len=80):
-    """
+    r"""
     Generate a regex pattern candidate from a payload snippet:
     - Trim, escape special regex chars
     - Replace sequences of digits/hex with \d+ optionally
