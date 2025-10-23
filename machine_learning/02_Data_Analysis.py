@@ -26,6 +26,7 @@ import dependencies
 # Commented out IPython magic to ensure Python compatibility.
 # %matplotlib inline
 
+import os
 import pandas as pd
 import numpy as np
 import pickle
@@ -776,7 +777,9 @@ display(classifier_results)
 #pickle.dump( classifier_results, open( "data/trained_classifiers_custom_all_features.p", "wb" ) )
 
 #Save classifiers in a pickle file to be able to re-use them without re-training
-pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
+# pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
+file_path = os.path.join(os.path.dirname(__file__), "data/trained_classifiers.p")
+pickle.dump(classifier_results, open(file_path, "wb"))
 
 """### Classifier results"""
 
@@ -835,14 +838,18 @@ Second, pick one classifier to save in a separate pickle, used later to implemen
 """
 
 #save complete list of classifiers to 'trained_classifiers'
-pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
+# pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
+file_path = os.path.join(os.path.dirname(__file__), "data/trained_classifiers.p")
+pickle.dump(classifier_results, open(file_path, "wb"))
 
 #In this case, we are going to implement tfidf 2grams RandomForest in our dummy server
 classifier = (custom_features_classifiers['model'].iloc[0])
 print(classifier)
 
 #Save classifiers in a pickle file to be able to re-use them without re-training
-pickle.dump( classifier, open( "data/tfidf_2grams_randomforest.p", "wb" ) )
+# pickle.dump( classifier, open( "data/tfidf_2grams_randomforest.p", "wb" ) )
+file_path = os.path.join(os.path.dirname(__file__), "data/tfidf_2grams_randomforest.p")
+pickle.dump(classifier_results, open(file_path, "wb"))
 
 """## Step4B - load pre-trained classifiers
 Instead of re-training all classifiers, load the classifiers from disk that we have already trained
