@@ -50,3 +50,9 @@ Từ chối = từ chối rõ ràng; phản hồi ngay lập tức cho người 
 Drop = loại bỏ âm thầm; không phản hồi (tàng hình hơn, lỗi chậm hơn). Lựa chọn dựa trên nhu cầu vận hành, chẩn đoán và tình hình bảo mật.
 
 ==> Hiện tại đã chạy được code train cơ bản, ra accuracy à 1.00 (khả năng cao đang bị overfit). Tiếp theo cần thử với các thuật toán khác, tinh chỉnh hyperparameter, và thêm dữ liệu để cải thiện mô hình.
+
+
+23/10/2025 (tuandat):
+- Đổi tên ml_model.py thành 1_Data_cleaning.py
+- Đổi tên train_ml.py thành 2_Data_analysis.py
+- Đổi tên test_predict.py thành
