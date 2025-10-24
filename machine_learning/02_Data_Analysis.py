@@ -70,7 +70,6 @@ from scipy.stats import expon
 """# Step2
 load the payloads into memory
 """
-
 payloads = pd.read_csv("data/payloads.csv",index_col='index')
 display(payloads.head(30))
 
@@ -837,19 +836,41 @@ First, export full list of trained classifiers for later use
 Second, pick one classifier to save in a separate pickle, used later to implement in a dummy server
 """
 
-#save complete list of classifiers to 'trained_classifiers'
-# pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
-file_path = os.path.join(os.path.dirname(__file__), "data/trained_classifiers.p")
-pickle.dump(classifier_results, open(file_path, "wb"))
+# #save complete list of classifiers to 'trained_classifiers'
+# # pickle.dump( classifier_results, open( "data/trained_classifiers.p", "wb" ) )
+# file_path = os.path.join(os.path.dirname(__file__), "data/trained_classifiers.p")
+# pickle.dump(classifier_results, open(file_path, "wb"))
+#
+# #In this case, we are going to implement tfidf 2grams RandomForest in our dummy server
+# classifier = (custom_features_classifiers['model'].iloc[0])
+# print(classifier)
+#
+# #Save classifiers in a pickle file to be able to re-use them without re-training
+# # pickle.dump( classifier, open( "data/tfidf_2grams_randomforest.p", "wb" ) )
+# file_path = os.path.join(os.path.dirname(__file__), "data/tfidf_2grams_randomforest.p")
+# pickle.dump(classifier_results, open(file_path, "wb"))
+
+
+# Thư mục machine_learning/data (tương đối với nơi file .py đang nằm)
+data_dir = os.path.join(os.path.dirname(__file__), "data")
+
+# Nếu folder chưa tồn tại thì tạo
+os.makedirs(data_dir, exist_ok=True)
+
+# Lưu full list classifiers
+# file_path_all = os.path.join(data_dir, "trained_classifiers.p")
+# pickle.dump(classifier_results, open(file_path_all, "wb"))
+with open("data/trained_classifiers.p", "wb") as f:
+    pickle.dump(classifier_results, f)
+print("[SAVE] DataFrame đã lưu vào data/payloads.pkl")
 
 #In this case, we are going to implement tfidf 2grams RandomForest in our dummy server
 classifier = (custom_features_classifiers['model'].iloc[0])
 print(classifier)
 
-#Save classifiers in a pickle file to be able to re-use them without re-training
-# pickle.dump( classifier, open( "data/tfidf_2grams_randomforest.p", "wb" ) )
-file_path = os.path.join(os.path.dirname(__file__), "data/tfidf_2grams_randomforest.p")
-pickle.dump(classifier_results, open(file_path, "wb"))
+# Lưu classifier tfidf_2grams_randomforest
+file_path_rf = os.path.join(data_dir, "tfidf_2grams_randomforest.p")
+pickle.dump(classifier, open(file_path_rf, "wb"))
 
 """## Step4B - load pre-trained classifiers
 Instead of re-training all classifiers, load the classifiers from disk that we have already trained
