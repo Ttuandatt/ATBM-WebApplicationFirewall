@@ -51,8 +51,81 @@ Drop = loại bỏ âm thầm; không phản hồi (tàng hình hơn, lỗi ch�
 
 ==> Hiện tại đã chạy được code train cơ bản, ra accuracy à 1.00 (khả năng cao đang bị overfit). Tiếp theo cần thử với các thuật toán khác, tinh chỉnh hyperparameter, và thêm dữ liệu để cải thiện mô hình.
 
-
-23/10/2025 (tuandat):
+=========================
+|| 23/10/2025 (tuandat):
+=========================
 - Đổi tên ml_model.py thành 1_Data_cleaning.py
 - Đổi tên train_ml.py thành 2_Data_analysis.py
 - Đổi tên test_predict.py thành
+
+=========================
+|| 24/10/2025 (tuandat):
+=========================
+1️⃣ hidden_layer_sizes
+```
+clf__hidden_layer_sizes=(500, 250, 125, 62)
+```
+- Đây là cấu trúc mạng nơ-ron ẩn: số lượng nơ-ron ở mỗi layer ẩn.
+    - Ví dụ (500, 250, 125, 62) có 4 layer ẩn, lần lượt 500, 250, 125, 62 nơ-ron.
+- Ảnh hưởng:
+    - Nhiều nơ-ron/layer → mô hình mạnh hơn, học dữ liệu phức tạp tốt hơn.
+    - Nhưng quá nhiều → dễ overfitting và tốn thời gian huấn luyện.
+
+2️⃣ alpha
+```
+clf__alpha = 0.0005, 0.001, 0.01, 0.1, 1
+```
+- Regularization term (L2 penalty) để tránh overfitting.
+- Ảnh hưởng:
+    - Nhỏ → mô hình có thể học quá mức dữ liệu huấn luyện (overfit).
+    - Lớn → mô hình đơn giản hơn, có thể underfit nếu quá cao.
+
+3️⃣ learning_rate
+```
+clf__learning_rate = ['constant', 'invscaling']
+```
+- Quy định cách learning rate thay đổi trong quá trình huấn luyện.
+    - 'constant' → learning rate giữ nguyên.
+    - 'invscaling' → giảm theo số epoch (eta = eta0 / t^power).
+- Ảnh hưởng:
+    - Giảm learning rate dần → giúp mô hình hội tụ ổn định, tránh “nhảy” qua minima.
+
+4️⃣ learning_rate_init
+```
+clf__learning_rate_init = [0.001, 0.01, 0.1, 1]
+```
+- Giá trị khởi tạo learning rate (eta0).
+- Ảnh hưởng:
+    - Quá nhỏ → học rất chậm, lâu hội tụ.
+    - Quá lớn → model có thể không hội tụ, hoặc loss nhảy lung tung.
+
+5️⃣ momentum
+```
+clf__momentum = [0, 0.9]
+```
+- Momentum giúp tăng tốc gradient descent và giảm khả năng kẹt tại local minima.
+- Ảnh hưởng:
+    - 0 → không dùng momentum.
+    - 0.9 → model học nhanh hơn và ổn định hơn.
+
+6️⃣ min_df trong vectorizer
+```
+vect__min_df = [1, 2, 5, 10, 20, 40]
+```
+- Chỉ giữ từ xuất hiện ≥ min_df.
+- Ảnh hưởng:
+    - Nhỏ → nhiều từ hiếm, có thể noise.
+    - Lớn → bỏ từ hiếm, giảm noise nhưng có thể mất thông tin.
+
+7️⃣ Early stopping
+- Khi loss không giảm đủ trong 10 epoch liên tiếp, training dừng sớm.
+- Giúp tránh overfitting và tiết kiệm thời gian.
+
+💡 Tóm tắt:
+
+hidden_layer_sizes, alpha, learning_rate, learning_rate_init, momentum → điều khiển MLP học thế nào.
+
+min_df → làm sạch dữ liệu văn bản trước khi học.
+
+GridSearchCV kết hợp các tham số này để tìm bộ tối ưu cho accuracy cao nhất.
+
