@@ -1,7 +1,7 @@
 # waf.py
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import os
+
 import re
 import json
 import time
@@ -9,7 +9,14 @@ import logging
 import threading
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
-from machine_learning.ml_model import predict_request, train_model
+
+# ML module
+try:
+    from ml_model import predict_request, train_from_logs
+except Exception as e:
+    logging.warning(f"⚠️ ML module chưa sẵn sàng: {e}")
+    predict_request = None
+    train_from_logs = None
 
 app = Flask(__name__)
 
@@ -20,8 +27,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RULES_FILE = os.path.join(BASE_DIR, "rules.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 LOG_FILE = os.path.join(LOG_DIR, "waf.log")
-ANALYZER_FILE = os.path.join(BASE_DIR, "analyzer.py")
 LOGS_JSON = os.path.join(BASE_DIR, "logs.json")
+ANALYZER_FILE = os.path.join(BASE_DIR, "analyzer.py")
 
 os.makedirs(LOG_DIR, exist_ok=True)
 
@@ -71,7 +78,7 @@ def save_to_logs_json(event_type, path):
     """Lưu mẫu request để ML training"""
     text = path
     label = 1 if "BLOCKED" in event_type else 0
-    record = {"text": text, "label": label}
+    record = {"text": text, "label": label, "src_ip": "unknown"}
 
     data = []
     if os.path.exists(LOGS_JSON):
@@ -129,9 +136,11 @@ def trigger_analyzer():
 
 def retrain_ml_async():
     """Huấn luyện lại ML model khi có dữ liệu mới"""
+    if train_from_logs is None:
+        return
     def run_train():
         try:
-            train_model()
+            train_from_logs(LOGS_JSON)
             logging.info("✅ ML model retrained successfully")
         except Exception as e:
             logging.error(f"❌ ML retrain failed: {e}")
@@ -157,22 +166,23 @@ def waf_filter():
         return block_response()
 
     # --- ML-based detection ---
-    try:
-        pred, prob = predict_request(text)
-        if pred == 1 and prob > 0.7:
-            ml_rule = {
-                "type": "ML_MODEL",
-                "pattern": f"prob={prob:.2f}",
-                "enabled": True,
-                "source": "xgboost"
-            }
-            log_event("ML_BLOCKED", src_ip, path, {"matched_rule": ml_rule})
-            retrain_ml_async()
-            return block_response()
-    except FileNotFoundError:
-        logging.warning("⚠️ ML model chưa được huấn luyện — bỏ qua kiểm tra ML.")
-    except Exception as e:
-        logging.error(f"Lỗi ML detection: {e}")
+    if predict_request:
+        try:
+            pred, prob = predict_request(text)
+            if pred == 1 and prob > 0.7:
+                ml_rule = {
+                    "type": "ML_MODEL",
+                    "pattern": f"prob={prob:.2f}",
+                    "enabled": True,
+                    "source": "randomforest"
+                }
+                log_event("ML_BLOCKED", src_ip, path, {"matched_rule": ml_rule})
+                retrain_ml_async()
+                return block_response()
+        except FileNotFoundError:
+            logging.warning("⚠️ ML model chưa được huấn luyện — bỏ qua kiểm tra ML.")
+        except Exception as e:
+            logging.error(f"Lỗi ML detection: {e}")
 
     # --- Nếu không bị chặn ---
     log_event("ALLOWED", src_ip, path, {"info": "passed"})

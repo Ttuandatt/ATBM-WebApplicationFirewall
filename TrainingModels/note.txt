@@ -1,0 +1,278 @@
+22/10/2025 (tuandat):
+- Khác biệt giữa "deny" và "drop" trong firewall logs:
+    + "deny": Gói tin bị từ chối và gửi thông báo về nguồn gốc.
+    + "drop": Gói tin bị loại bỏ mà không gửi thông báo nào.
+- Cụ thể hơn:
+"Firewall Deny" và "Firewall Drop" mô tả hai cách khác nhau mà tường lửa xử lý các gói tin khớp với quy tắc từ chối lưu lượng. Sự khác biệt này ảnh hưởng đến cách người gửi được thông báo, hành vi kết nối, ghi nhật ký và tương tác tường lửa có trạng thái.
+
+Sự khác biệt cốt lõi
+
+Phản hồi cho người gửi
+Từ chối: chủ động từ chối gói tin và trả về một gói tin lỗi cho người gửi (thường là một gói tin ICMP không thể truy cập được đối với IP/UDP hoặc một gói tin TCP RST đối với TCP). Người gửi ngay lập tức biết rằng gói tin đã bị từ chối.
+Drop: âm thầm loại bỏ gói tin; không có phản hồi nào được gửi đi. Người gửi chỉ thấy thiếu phản hồi, có thể trông giống như mất gói tin hoặc tường lửa cố tình ẩn mình.
+Tác động đến hành vi kết nối
+Từ chối: chấm dứt hoặc ngăn chặn kết nối nhanh chóng vì thông báo từ chối thông báo cho các điểm cuối dừng thử lại hoặc đóng các nỗ lực.
+Bỏ qua: người gửi có thể tiếp tục truyền lại (thử lại TCP) hoặc đợi cho đến khi hết thời gian; nỗ lực kết nối bị treo hoặc chậm.
+Các trường hợp sử dụng và mục đích
+Từ chối: được sử dụng khi bạn muốn lỗi nhanh, phản hồi chẩn đoán tốt hơn hoặc để báo hiệu rõ ràng rằng lưu lượng không được phép (hữu ích cho các máy khách hợp pháp và xử lý sự cố).
+Drop: được sử dụng để tàng hình/ẩn (làm cho các dịch vụ có vẻ không thể truy cập được), làm chậm kẻ tấn công bằng cách gây ra thời gian chờ hoặc để tránh tiết lộ sự hiện diện của tường lửa hoặc cấu trúc mạng.
+Sự đánh đổi về an ninh/hoạt động
+Từ chối:
+Ưu điểm: chuyển đổi dự phòng nhanh hơn, xử lý sự cố tốt hơn, giảm số lần thử lại và tải không cần thiết.
+Nhược điểm: cung cấp thông tin cho kẻ tấn công (tiết lộ máy chủ tồn tại và đang chủ động từ chối).
+Làm rơi:
+Ưu điểm: tàng hình hơn, có thể ngăn chặn máy quét và các cuộc tấn công tự động.
+Nhược điểm: lãng phí thời gian thử lại/hết thời gian chờ của máy khách, khó khắc phục sự cố, có thể gây ra tác dụng phụ cho các dịch vụ hợp pháp (treo lâu).
+Ghi nhật ký và giám sát
+Cả hai đều có thể được ghi lại, nhưng hành vi ghi lại thực tế sẽ khác nhau:
+Từ chối: nhật ký cùng với phản hồi từ chối rõ ràng cung cấp bằng chứng rõ ràng hơn về các sự kiện từ chối.
+Bỏ qua: nhật ký rất cần thiết để hiển thị; nếu không ghi nhật ký, các gói tin bị bỏ qua sẽ không hiển thị và có thể làm phức tạp quá trình ứng phó sự cố.
+Tường lửa có trạng thái so với tường lửa không trạng thái
+Thiết bị có trạng thái thường theo dõi trạng thái kết nối và hành động "từ chối" hay "hủy" của nó có thể ảnh hưởng đến việc nó có gửi reset/ICMP hay không và cách nó xóa trạng thái.
+Bộ lọc không trạng thái chỉ áp dụng quyết định đã cấu hình cho mỗi gói tin.
+Ví dụ và hành vi điển hình
+
+Cổng TCP bị chặn bằng Từ chối: máy khách nhận được TCP RST → kết nối bị lỗi ngay lập tức.
+Cổng TCP bị chặn với Drop: máy khách thấy thời gian chờ SYN, nhiều lần truyền lại, cuối cùng là thời gian chờ.
+Dịch vụ UDP bị hủy: máy khách không nhận được ICMP không thể truy cập → xuất hiện dưới dạng mất gói tin.
+Gửi ICMP không thể truy cập với Từ chối có thể đưa ra chẩn đoán nhanh hơn (trả lời ping với đích không thể truy cập so với im lặng).
+Khi nào nên chọn cái nào
+
+Sử dụng Từ chối khi: hỗ trợ khách hàng hợp pháp, giảm số lần thử lại, giúp khắc phục sự cố dễ dàng hơn và khi việc từ chối được chấp nhận.
+Sử dụng Drop khi: giảm thiểu rò rỉ thông tin, ngăn chặn hoạt động do thám hoặc thực hiện tư thế ẩn náu mặc định.
+Ghi chú thực hiện
+
+Thuật ngữ có thể khác nhau: một số nhà cung cấp gọi "từ chối" trong khi những nhà cung cấp khác gọi là "từ chối"; xác nhận tài liệu của nhà cung cấp. Điều quan trọng là tường lửa gửi lệnh từ chối rõ ràng ở cấp độ giao thức (từ chối/từ chối) hay âm thầm loại bỏ (loại bỏ).
+Nhiều giao diện người dùng tường lửa cung cấp cả hai tùy chọn; hãy kiểm tra phản hồi được trả về (ICMP, TCP RST, không có gì) để hiểu chính xác hành vi.
+Bản tóm tắt
+
+Từ chối = từ chối rõ ràng; phản hồi ngay lập tức cho người gửi (xử lý nhanh hơn, ít lén lút hơn).
+Drop = loại bỏ âm thầm; không phản hồi (tàng hình hơn, lỗi chậm hơn). Lựa chọn dựa trên nhu cầu vận hành, chẩn đoán và tình hình bảo mật.
+
+==> Hiện tại đã chạy được code train cơ bản, ra accuracy à 1.00 (khả năng cao đang bị overfit). Tiếp theo cần thử với các thuật toán khác, tinh chỉnh hyperparameter, và thêm dữ liệu để cải thiện mô hình.
+
+=========================
+|| 23/10/2025 (tuandat):
+=========================
+- Đổi tên ml_model.py thành 1_Data_cleaning.py
+- Đổi tên train_ml.py thành 2_Data_analysis.py
+- Đổi tên test_predict.py thành
+
+=========================
+|| 24/10/2025 (tuandat):
+=========================
+1️⃣ hidden_layer_sizes
+```
+clf__hidden_layer_sizes=(500, 250, 125, 62)
+```
+- Đây là cấu trúc mạng nơ-ron ẩn: số lượng nơ-ron ở mỗi layer ẩn.
+    - Ví dụ (500, 250, 125, 62) có 4 layer ẩn, lần lượt 500, 250, 125, 62 nơ-ron.
+- Ảnh hưởng:
+    - Nhiều nơ-ron/layer → mô hình mạnh hơn, học dữ liệu phức tạp tốt hơn.
+    - Nhưng quá nhiều → dễ overfitting và tốn thời gian huấn luyện.
+
+2️⃣ alpha
+```
+clf__alpha = 0.0005, 0.001, 0.01, 0.1, 1
+```
+- Regularization term (L2 penalty) để tránh overfitting.
+- Ảnh hưởng:
+    - Nhỏ → mô hình có thể học quá mức dữ liệu huấn luyện (overfit).
+    - Lớn → mô hình đơn giản hơn, có thể underfit nếu quá cao.
+
+3️⃣ learning_rate
+```
+clf__learning_rate = ['constant', 'invscaling']
+```
+- Quy định cách learning rate thay đổi trong quá trình huấn luyện.
+    - 'constant' → learning rate giữ nguyên.
+    - 'invscaling' → giảm theo số epoch (eta = eta0 / t^power).
+- Ảnh hưởng:
+    - Giảm learning rate dần → giúp mô hình hội tụ ổn định, tránh “nhảy” qua minima.
+
+4️⃣ learning_rate_init
+```
+clf__learning_rate_init = [0.001, 0.01, 0.1, 1]
+```
+- Giá trị khởi tạo learning rate (eta0).
+- Ảnh hưởng:
+    - Quá nhỏ → học rất chậm, lâu hội tụ.
+    - Quá lớn → model có thể không hội tụ, hoặc loss nhảy lung tung.
+
+5️⃣ momentum
+```
+clf__momentum = [0, 0.9]
+```
+- Momentum giúp tăng tốc gradient descent và giảm khả năng kẹt tại local minima.
+- Ảnh hưởng:
+    - 0 → không dùng momentum.
+    - 0.9 → model học nhanh hơn và ổn định hơn.
+
+6️⃣ min_df trong vectorizer
+```
+vect__min_df = [1, 2, 5, 10, 20, 40]
+```
+- Chỉ giữ từ xuất hiện ≥ min_df.
+- Ảnh hưởng:
+    - Nhỏ → nhiều từ hiếm, có thể noise.
+    - Lớn → bỏ từ hiếm, giảm noise nhưng có thể mất thông tin.
+
+7️⃣ Early stopping
+- Khi loss không giảm đủ trong 10 epoch liên tiếp, training dừng sớm.
+- Giúp tránh overfitting và tiết kiệm thời gian.
+
+💡 Tóm tắt:
+
+hidden_layer_sizes, alpha, learning_rate, learning_rate_init, momentum → điều khiển MLP học thế nào.
+
+min_df → làm sạch dữ liệu văn bản trước khi học.
+
+GridSearchCV kết hợp các tham số này để tìm bộ tối ưu cho accuracy cao nhất.
+
+
+
+'''
+
+'''
+
+
+Cần Hoàn thiện backend/ml_model.py loader/predict wrapper và tích hợp vào backend/waf.py.
+
+01_Data_Cleaning cũ:
+"""
+1_Data_cleaning.py
+------------------
+Script làm sạch dữ liệu payload cho dự án Machine Learning Web Application Firewall (WAF)
+
+Chức năng:
+- Đọc dữ liệu từ các file .txt (SQL, XSS, SHELL)
+- Gắn nhãn (malicious hoặc non-malicious)
+- Làm sạch dữ liệu: loại bỏ trùng, trống, ký tự thừa, payload lỗi
+- Trộn ngẫu nhiên dữ liệu để tránh bias
+- Lưu kết quả thành .csv và .pickle để sử dụng trong bước phân tích
+"""
+
+# ===============================
+# STEP 1: Import thư viện cần thiết
+# ===============================
+import numpy as np
+import pandas as pd
+import pickle
+
+# ===============================
+# STEP 2: Định nghĩa hàm đọc file .txt và tạo DataFrame
+# ===============================
+def from_txt_to_dataframe(src_file, is_malicious, injection_type):
+    """
+    Đọc payloads từ file txt trong thư mục 'data/'
+    và tạo thành DataFrame gồm:
+    - payload: chuỗi dữ liệu
+    - is_malicious: 1 nếu là dữ liệu tấn công, 0 nếu hợp lệ
+    - injection_type: loại tấn công (SQL, XSS, SHELL, LEGAL)
+    """
+    path = f"data/{src_file}.txt"
+    with open(path, "r", encoding="utf-8") as f:
+        payloads_txt = f.readlines()
+
+    # Tạo DataFrame từ danh sách payloads
+    payloads = pd.DataFrame(payloads_txt, columns=["payload"])
+    payloads["is_malicious"] = [is_malicious] * len(payloads)
+    payloads["injection_type"] = [injection_type] * len(payloads)
+
+    print(f"[INFO] Loaded {len(payloads)} payloads from {src_file}.txt ({injection_type})")
+    print(payloads.head(), "\n")
+    return payloads
+
+
+# ===============================
+# STEP 3: Gộp tất cả payloads vào 1 DataFrame
+# ===============================
+payloads = pd.DataFrame(columns=["payload", "is_malicious", "injection_type"])
+
+payloads = pd.concat([
+    from_txt_to_dataframe("SQLCollection", 1, "SQL"),
+    from_txt_to_dataframe("XSSCollection", 1, "XSS"),
+    from_txt_to_dataframe("ShellCollection", 1, "SHELL"),
+    from_txt_to_dataframe("non-maliciousCollection", 0, "LEGAL")
+], ignore_index=True)
+
+print(f"[INFO] Tổng số dòng ban đầu: {len(payloads)}\n")
+
+# ===============================
+# STEP 4: Làm sạch dữ liệu
+# ===============================
+
+# 4.1. Xóa ký tự xuống dòng '\n' và khoảng trắng dư thừa
+payloads["payload"] = payloads["payload"].str.strip("\n")
+payloads["payload"] = payloads["payload"].str.strip()
+
+# 4.2. Loại bỏ dòng trống
+rows_before = len(payloads)
+payloads = payloads[payloads["payload"].str.len() != 0]
+print(f"[CLEAN] Empty payloads removed: {rows_before - len(payloads)}")
+
+# 4.3. Loại bỏ payload tấn công có độ dài = 1 ký tự
+rows_before = len(payloads)
+payloads = payloads[
+    (payloads["is_malicious"] == 0) |
+    ((payloads["is_malicious"] == 1) & (payloads["payload"].str.len() > 1))
+]
+print(f"[CLEAN] Malicious payloads of length 1 removed: {rows_before - len(payloads)}")
+
+# 4.4. Loại bỏ dòng trùng lặp
+rows_before = len(payloads)
+payloads = payloads.drop_duplicates(subset="payload", keep="last")
+print(f"[CLEAN] Duplicate payloads removed: {rows_before - len(payloads)}")
+
+# 4.5. Xử lý các payload có định dạng byte (b'<payload>') → chuyển thành chuỗi bình thường
+payloads["payload"] = [
+    p[2:-1] if p.startswith("b'") or p.startswith('b"') else p
+    for p in payloads["payload"]
+]
+
+# ===============================
+# STEP 5: Shuffle dữ liệu và reset index
+# ===============================
+payloads = payloads.sample(frac=1).reset_index(drop=True)
+payloads.index.name = "index"
+
+# ===============================
+# STEP 6: Lưu dữ liệu ra file CSV
+# ===============================
+payloads.to_csv("data/payloads.csv", encoding="utf-8")
+print(f"[SAVE] Dữ liệu đã lưu vào data/payloads.csv ({len(payloads)} dòng)")
+
+# ===============================
+# STEP 7: Kiểm tra và loại bỏ giá trị null sau khi lưu CSV
+# ===============================
+payloads = pd.read_csv("data/raw/payloads.csv", index_col="index", encoding="utf-8")
+rows_before = len(payloads)
+payloads = payloads[~payloads["payload"].isnull()]
+print(f"[CLEAN] Null/NaN payloads removed: {rows_before - len(payloads)}")
+
+# Lưu lại file CSV sau khi loại null
+payloads.to_csv("data/payloads.csv", encoding="utf-8")
+
+# ===============================
+# STEP 8: (Tuỳ chọn) Lưu DataFrame thành file .pickle để load nhanh sau này
+# ===============================
+with open("data/payloads.pkl", "wb") as f:
+    pickle.dump(payloads, f)
+print("[SAVE] DataFrame đã lưu vào data/payloads.pkl")
+
+print("\n[INFO] Data cleaning hoàn tất.")
+print(f"Tổng số payloads cuối cùng: {len(payloads)}")
+print(payloads.head())
+
+
+SQL Injection Dataset:
+1. https://github.com/grananqvist/Machine-Learning-Web-Application-Firewall-and-Dataset/tree/master/data
+2. https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset/data
+3. https://github.com/chouaibcher/WAF-AI/blob/main/data/raw/SQLpayloads.txt
+
+XSS Dataset:
+1. https://www.kaggle.com/datasets/syedsaqlainhussain/cross-site-scripting-xss-dataset-for-deep-learning
+2. https://github.com/grananqvist/Machine-Learning-Web-Application-Firewall-and-Dataset/tree/master/data
+
+All Dataset:
+1. https://github.com/foospidy/payloads/tree/master
