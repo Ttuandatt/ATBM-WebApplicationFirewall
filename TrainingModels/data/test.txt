@@ -1,0 +1,7 @@
+Link lấy SQL injection string:
+1. https://owasp.org/www-community/attacks/SQL_Injection
+
+Link lấy XSS injection string:
+1. https://owasp.org/www-community/attacks/xss/
+
+OWASP: OWASP (Open Web Application Security Project) là một tổ chức phi lợi nhuận toàn cầu, tập trung vào việc cải thiện bảo mật cho ứng dụng web và dịch vụ web.
