@@ -171,7 +171,7 @@ def main():
     y_pred_svm = svm_classifier.predict(X_test)
     print("SVM Accuracy:", accuracy_score(y_test, y_pred_svm))
     print("SVM Classification Report:\n", classification_report(y_test, y_pred_svm))
-
+    
     # 3) Logistic Regression
     print("\nTraining LogisticRegression...")
     logistic_reg = LogisticRegression(max_iter=2000)
