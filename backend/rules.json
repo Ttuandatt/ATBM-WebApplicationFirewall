@@ -1,4 +1,98 @@
 [
-  { "id": 1, "type": "regex", "pattern": "(<script>.*?</script>)", "enabled": true, "source": "seed" },
-  { "id": 2, "type": "regex", "pattern": "(UNION.*SELECT.*FROM)", "enabled": true, "source": "seed" }
+  {
+    "id": 1,
+    "type": "XSS",
+    "pattern": "<script[^>]*?>[\\s\\S]*?<\\/script>",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Chặn payload XSS dạng <script>...</script>. Dùng để phát hiện script tag trực tiếp trong body/query. (FP risk: thấp nếu đã decode input)."
+  },
+  {
+    "id": 2,
+    "type": "XSS",
+    "pattern": "(?:on\\w+\\s*=\\s*['\\\"][^'\\\"]+['\\\"])",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Chặn attribute handler (ví dụ onerror=, onclick=) có thể dùng cho XSS; dễ FP nếu ứng dụng cho phép inline event attributes trong rich HTML."
+  },
+  {
+    "id": 3,
+    "type": "SQLi",
+    "pattern": "(?:union\\s+select\\b)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Phát hiện pattern 'UNION SELECT' – chỉ dùng khi normalized và case-insensitive. Rất hiệu quả với SQLi dạng union-based."
+  },
+  {
+    "id": 4,
+    "type": "SQLi",
+    "pattern": "(?:\\b(or|and)\\s+\\d+\\s*=\\s*\\d+\\b|\\b(or|and)\\s+['\\\"][^'\\\"]+['\\\"]\\s*=\\s*['\\\"][^'\\\"]+['\\\"])",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Phát hiện boolean tautology hoặc boolean comparison thường dùng cho SQLi (vd: ' or '1'='1'). Đặt disabled mặc định vì dễ FP trên query hợp lệ containing 'or'/'and'."
+  },
+  {
+    "id": 5,
+    "type": "LFI",
+    "pattern": "(?:\\.\\./|/etc/passwd|/proc/self/environ)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Path traversal / LFI: phát hiện '..' traversal hoặc tham chiếu tới file hệ thống thường gặp (/etc/passwd). Sử dụng để chặn attempts đọc file hệ thống."
+  },
+  {
+    "id": 6,
+    "type": "RFI/SSRF",
+    "pattern": "(?:https?:\\/\\/(?:127\\.0\\.0\\.1|localhost|169\\.254\\.169\\.254)|file:\\/\\/|php:\\/\\/)",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Phát hiện request tới internal metadata IP hoặc các scheme nguy hiểm (file://, php://). Mặc định disabled — dùng khi site có trường URL input (thumbnails, fetcher)."
+  },
+  {
+    "id": 7,
+    "type": "CMD_INJECTION",
+    "pattern": "(?:;\\s*(?:rm|shutdown|reboot|nc|curl|wget)\\b|\\|\\s*(?:rm|nc|curl|wget)\\b)",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Phát hiện các chuỗi shell metacharacters kết hợp với lệnh nguy hiểm (ví dụ ; rm -rf). Dễ FP nếu app cho phép các ký tự này hợp lệ — enable cẩn trọng."
+  },
+  {
+    "id": 8,
+    "type": "FILE_UPLOAD_RCE",
+    "pattern": "(?:<\\?php|<%\\s*script|eval\\(|base64_decode\\()",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Phát hiện đoạn mã server-side (PHP, ASP, eval(...), base64_decode) có thể xuất hiện trong file upload hoặc nội dung. Dùng để chặn upload file chứa mã thực thi."
+  },
+  {
+    "id": 9,
+    "type": "PATH_TRAVERSAL",
+    "pattern": "(?:%2e%2e%2f|%2e%2e\\/|\\.\\.%2f|\\.\\./)",
+    "enabled": true,
+    "source": "seed",
+    "comment": "Path traversal encoded variants (.. /) — chặn các dạng đã được URL-encoded. Cần decode input trước match; giữ pattern để bắt evasion bằng encoding."
+  },
+  {
+    "id": 10,
+    "type": "OPEN_REDIRECT",
+    "pattern": "(?:redirect=|url=|next=)[^\\s]+(?:https?:\\/\\/[^\\s]+)",
+    "enabled": false,
+    "source": "seed",
+    "comment": "Phát hiện tham số redirect chứa external URL (có thể gây open redirect). Disabled mặc định — có thể dùng để log/alert thay vì block."
+  },
+  {
+    "id": 11,
+    "type": "regex",
+    "pattern": "([;&|]{1,2}\\s*(cat|ls|whoami|id|rm)\\b)",
+    "enabled": true,
+    "source": "auto_analyzer",
+    "comment": "Tự sinh từ logs (2 lần / 1 IP)"
+  },
+  {
+    "id": 12,
+    "type": "SQL_TAUTOLOGY",
+    "pattern": "(?i)(?:\\bor\\b|\\bor\\b).{0,10}?[\\d'\\\"`]+\\s*=\\s*[\\d'\\\"`]+",
+    "enabled": true,
+    "source": "auto_analyzer",
+    "comment": "Tự sinh từ logs (5 lần / 1 IP)"
+  }
 ]
