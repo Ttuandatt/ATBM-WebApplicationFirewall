@@ -1,0 +1,9 @@
+model,accuracy,report_file,model_file
+NaiveBayes,0.9579976985040276,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\NaiveBayes_report.txt
+SVM,0.9640169956625652,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\SVM_report.txt
+LogisticRegression,0.9497211649110384,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\LogisticRegression_report.txt
+DecisionTree,0.9574665840488624,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\DecisionTree_report.txt
+Bagging,0.9563158360626716,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\Bagging_report.txt
+AdaBoost,0.9576878817385146,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\AdaBoost_report.txt
+RandomForest,0.9564928742143932,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\RandomForest_report.txt
+Stacking,0.9643268124280783,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SQLInjection\Stacking_report.txt
