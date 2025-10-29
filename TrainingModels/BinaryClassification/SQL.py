@@ -139,10 +139,10 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     # Thư mục lưu model + kết quả
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    save_dir = os.path.join(script_dir, "saved_models")
-    results_path = os.path.join(save_dir, "results.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # => .../TrainingModels/BinaryClassification
+    save_dir = os.path.join(script_dir, "saved_models", "SQLInjection")  # ✅ thư mục mới
     os.makedirs(save_dir, exist_ok=True)
+    results_path = os.path.join(save_dir, "results.csv")  # ✅ file CSV nằm trong SQLInjection
 
     results_df = load_previous_results(results_path)
 
@@ -155,16 +155,17 @@ def main():
         ("LogisticRegression", LogisticRegression(max_iter=2000)),
         ("DecisionTree", DecisionTreeClassifier()),
         ("Bagging", BaggingClassifier(estimator=DecisionTreeClassifier(), n_estimators=50, random_state=42)),
-        ("AdaBoost", AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), n_estimators=30, random_state=42))
-        # ("RandomForest", RandomForestClassifier(n_estimators=100, random_state=42)),
-        # ("Stacking", StackingClassifier(
-        #     estimators=[
-        #         ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
-        #         ('svc', SVC(probability=True, random_state=42))
-        #     ],
-        #     final_estimator=LogisticRegression(),
-        #     n_jobs=-1
-        # ))
+        ("AdaBoost",
+         AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), n_estimators=30, random_state=42)),
+        ("RandomForest", RandomForestClassifier(n_estimators=100, random_state=42)),
+        ("Stacking", StackingClassifier(
+            estimators=[
+                ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
+                ('svc', SVC(probability=True, random_state=42))
+            ],
+            final_estimator=LogisticRegression(),
+            n_jobs=-1
+        ))
     ]
 
     # =====================================================
@@ -211,15 +212,15 @@ def main():
         if os.path.exists(results_path):
             df_results = pd.read_csv(results_path)
             if not df_results.empty:
-                # Ép kiểu cột accuracy sang float để so sánh
                 df_results["accuracy"] = pd.to_numeric(df_results["accuracy"], errors="coerce")
                 best_row = df_results.loc[df_results["accuracy"].idxmax()]
                 best_model_name = best_row["model"]
                 best_acc = best_row["accuracy"]
-                best_model_path = best_row["model_file"]
+
+                # Tạo đường dẫn model từ save_dir
+                best_model_path = os.path.join(save_dir, f"{best_model_name}.pkl")
 
                 print(f"✅ Model tốt nhất trước đó: {best_model_name} (accuracy={best_acc:.4f})")
-                # Load lại model tốt nhất từ file .pkl
                 best_model = joblib.load(best_model_path)
             else:
                 print("⚠️ File results.csv rỗng — không có model nào để chọn.")
