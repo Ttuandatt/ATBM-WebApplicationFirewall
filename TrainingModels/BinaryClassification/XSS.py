@@ -180,16 +180,16 @@ def main():
         ("LogisticRegression", LogisticRegression(max_iter=2000)),
         ("DecisionTree", DecisionTreeClassifier()),
         ("Bagging", BaggingClassifier(estimator=DecisionTreeClassifier(), n_estimators=50, random_state=42)),
-        ("AdaBoost", AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), n_estimators=30, random_state=42)),
-        ("RandomForest", RandomForestClassifier(n_estimators=100, random_state=42)),
-        ("Stacking", StackingClassifier(
-            estimators=[
-                ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
-                ('svc', SVC(probability=True, random_state=42))
-            ],
-            final_estimator=LogisticRegression(),
-            n_jobs=-1
-        ))
+        ("AdaBoost", AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), n_estimators=30, random_state=42))
+        # ("RandomForest", RandomForestClassifier(n_estimators=100, random_state=42)),
+        # ("Stacking", StackingClassifier(
+        #     estimators=[
+        #         ('rf', RandomForestClassifier(n_estimators=50, random_state=42)),
+        #         ('svc', SVC(probability=True, random_state=42))
+        #     ],
+        #     final_estimator=LogisticRegression(),
+        #     n_jobs=-1
+        # ))
     ]
 
     best_model_name = None
