@@ -1,83 +1,28 @@
-RuleForge/
-├─ backend/                       # Flask backend + admin API + existing waf/backend
-│  ├─ venv/                       # (tùy, local virtualenv)
-│  ├─ backend_app.py              # (bạn có sẵn) demo app (port 5001)
-│  ├─ waf.py                      # (bạn có sẵn) WAF proxy (port 5000)
-│  ├─ admin_api.py                # Flask API để UI gọi (new)
-│  ├─ analyzer.py                 # (bạn có sẵn) analyzer script (run manually or via admin_api)
-│  ├─ utils.py                    # (bạn có sẵn)
-│  ├─ rules.json
-│  ├─ logs/
-│  │  └─ waf.log
-│  ├─ requirements.txt
-│  └─ README-backend.md
-│
-├─ frontend/                      # React + Vite UI
-│  ├─ node_modules/
-│  ├─ index.html
-│  ├─ package.json
-│  ├─ package-lock.json
-│  ├─ src/
-│  │  ├─ main.jsx
-│  │  ├─ App.jsx
-│  │  ├─ components/
-│  │  │  ├─ RuleList.jsx
-│  │  │  ├─ LogsView.jsx
-│  │  │  └─ AnalyzerPanel.jsx
-│  │  └─ styles.css
-│  └─ README-frontend.md
-├─ admin-ui/
-│  ├─ index.html
-│  ├─ style.css
-│  └─ script.js
-├─ README.md
-└─ note.txt
+30/10/2025 (tuandat):
 
+Các bước chạy app với quyền Administrator (Windows / PowerShell)
+# 1. Mở PowerShell as admin
+# 2. Vào thư mục root project
+Set-Location -Path "D:\IT\ATBM-WebApplicationFirewall"
 
-20/10/2025:
-🧱 Tổng quan thay đổi chính – RuleForge WAF Backend
-1️⃣ Tự động kích hoạt phân tích (Analyzer Integration)
-- Khi có một truy cập bị BLOCKED, waf.py tự động gọi analyzer.py.
-- Mục đích: giúp hệ thống tự động học thêm các pattern mới → lưu vào rules.json.
-- Cơ chế debounce async đảm bảo chỉ chạy analyzer khi có log mới, tránh spam process.
+# 3. Tạo venv (nếu cần)
+python -m venv venv
 
-2️⃣ Bổ sung Machine Learning (ML Layer)
-- Thêm file ml_model.py dùng mô hình XGBoost (hoặc LightGBM) để:
-    + Phân tích và phát hiện các request nghi ngờ không nằm trong rules.json.
-    + Hỗ trợ phân loại tấn công (benign/malicious) dựa trên đặc trưng của request.
-- waf.py nay gọi predict_request() trong ml_model.py để kết hợp rule-based + ML-based detection.
+# 4. Kích hoạt venv (khi ở root)
+.\venv\Scripts\activate
 
-3️⃣ Dữ liệu huấn luyện & logs mẫu
-- Tạo thêm file logs.json chứa các request mẫu (normal / attack).
-- ML model dùng các đặc trưng như:
-    + Độ dài query, số ký tự đặc biệt, có chứa script, số chữ hoa, ký tự ../, SELECT, UNION, v.v.
-- Dữ liệu này dùng để huấn luyện ban đầu cho mô hình XGBoost → cho phép tường lửa học hành vi tấn công.
+# nếu ở WAF và venv ở root
+# ..\venv\Scripts\activate
 
-4️⃣ Cách demo cho team
+# 5. Cài phụ thuộc
+pip install -r requirements.txt
+# hoặc
+pip install flask numpy joblib scikit-learn
 
-- Chạy backend
-```
-cd backend
-python waf.py
-```
+# 6. Chạy (từ gốc, hoặc cd vào WAF)
+# Từ gốc, chạy module:
+python -m WAF.FlaskSimpleTest
 
-Gửi request hợp lệ
-```
-Invoke-WebRequest -Uri "http://127.0.0.1:5000/search?q=iphone" -UseBasicParsing
-```
-→ ✅ Response: ALLOWED
-
-
-Gửi request tấn công
-```
-Invoke-WebRequest -Uri "http://127.0.0.1:5000/search?q=' OR '1'='1" -UseBasicParsing
-```
-→ 🚫 BLOCKED → tự động gọi analyzer.py → rules.json cập nhật → ML được train thêm.
-
-Kiểm tra lại logs.json để thấy các mẫu request đã được lưu và đánh nhãn.
-
-5️⃣ Lợi ích
-Hệ thống nay có khả năng:
-- Phát hiện chủ động (rules) + phát hiện thích nghi (ML).
-- Tự cập nhật tri thức khi gặp pattern mới.
-- Phân tích thông minh nhờ mô hình XGBoost thay vì chỉ dùng regex.
+# Hoặc cd vào WAF rồi chạy file (sau khi activated venv)
+cd WAF
+python FlaskSimpleTest.py

@@ -1,12 +1,16 @@
 import os
 import sys
 import ctypes
-from flask import Flask, jsonify
+
+# fix import path when running from inside WAF/
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from WAF import WAF_Flask
+from flask import Flask, jsonify
 
 
 ## runing the flask app as admin -- start
-'''
+
 def is_admin():
     if os.name == 'nt':  # Windows
         try:
@@ -31,7 +35,7 @@ def elevate_privileges():
 
 if not is_admin():
     elevate_privileges()
-'''
+
 ## runing the flask app as admin -- end
 
 # Create Flask App
