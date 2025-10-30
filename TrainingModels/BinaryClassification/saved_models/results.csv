@@ -1,6 +1,0 @@
-model,accuracy,report_file,model_file
-NaiveBayes,0.9579976985040276,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\NaiveBayes_report.txt,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\NaiveBayes.pkl
-SVM,0.9640169956625652,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SVM_report.txt,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\SVM.pkl
-LogisticRegression,0.9497211649110384,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\LogisticRegression_report.txt,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\LogisticRegression.pkl
-DecisionTree,0.9574665840488624,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\DecisionTree_report.txt,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\DecisionTree.pkl
-Bagging,0.9563158360626715,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\Bagging_report.txt,D:\IT\ATBM-WebApplicationFirewall\TrainingModels\BinaryClassification\saved_models\Bagging.pkl

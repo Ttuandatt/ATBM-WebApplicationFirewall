@@ -47,7 +47,6 @@ def find_dataset():
 def custom_tokenizer(text):
     return text.split()
 
-
 def ensure_dir(path):
     """Đảm bảo thư mục tồn tại."""
     d = os.path.dirname(path)
@@ -140,10 +139,10 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     # Thư mục lưu model + kết quả
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    save_dir = os.path.join(script_dir, "saved_models")
-    results_path = os.path.join(save_dir, "results.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # => .../TrainingModels/BinaryClassification
+    save_dir = os.path.join(script_dir, "saved_models", "SQLInjection")  # ✅ thư mục mới
     os.makedirs(save_dir, exist_ok=True)
+    results_path = os.path.join(save_dir, "results.csv")  # ✅ file CSV nằm trong SQLInjection
 
     results_df = load_previous_results(results_path)
 
@@ -156,7 +155,8 @@ def main():
         ("LogisticRegression", LogisticRegression(max_iter=2000)),
         ("DecisionTree", DecisionTreeClassifier()),
         ("Bagging", BaggingClassifier(estimator=DecisionTreeClassifier(), n_estimators=50, random_state=42)),
-        ("AdaBoost", AdaBoostClassifier(estimator=DecisionTreeClassifier(), n_estimators=50, random_state=42)),
+        ("AdaBoost",
+         AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), n_estimators=30, random_state=42)),
         ("RandomForest", RandomForestClassifier(n_estimators=100, random_state=42)),
         ("Stacking", StackingClassifier(
             estimators=[
@@ -171,6 +171,10 @@ def main():
     # =====================================================
     # 🔸 Train từng mô hình (chỉ train nếu chưa có kết quả)
     # =====================================================
+    best_model_name = None
+    best_acc = 0
+    best_model = None
+
     for model_name, clf in models:
         if model_already_trained(results_df, model_name):
             print(f"⏩ Bỏ qua {model_name} (đã có trong kết quả trước đó).")
@@ -186,18 +190,57 @@ def main():
         print(f"{model_name} Accuracy: {acc:.4f}")
         print(report)
 
-        # Lưu model
+        # Lưu model tạm thời
         model_path = os.path.join(save_dir, f"{model_name}.pkl")
         joblib.dump(clf, model_path)
 
         # Ghi kết quả
         save_result(results_path, model_name, acc, report, model_path)
 
-    # Lưu vectorizer (nếu chưa có)
-    vect_path = os.path.join(save_dir, "count_vectorizer.pkl")
-    if not os.path.exists(vect_path):
-        joblib.dump(vectorizer, vect_path)
-        print(f"💾 Saved vectorizer to: {vect_path}")
+        # Cập nhật model tốt nhất
+        if acc > best_acc:
+            best_acc = acc
+            best_model_name = model_name
+            best_model = clf
+
+    # =====================================================
+    # 🔸 Nếu không có model mới nào được train, chọn từ file results.csv
+    # =====================================================
+    if best_model is None:
+        print("⚠️ Không có model nào được train mới. Đang chọn model tốt nhất từ kết quả trước đó...")
+
+        if os.path.exists(results_path):
+            df_results = pd.read_csv(results_path)
+            if not df_results.empty:
+                df_results["accuracy"] = pd.to_numeric(df_results["accuracy"], errors="coerce")
+                best_row = df_results.loc[df_results["accuracy"].idxmax()]
+                best_model_name = best_row["model"]
+                best_acc = best_row["accuracy"]
+
+                # Tạo đường dẫn model từ save_dir
+                best_model_path = os.path.join(save_dir, f"{best_model_name}.pkl")
+
+                print(f"✅ Model tốt nhất trước đó: {best_model_name} (accuracy={best_acc:.4f})")
+                best_model = joblib.load(best_model_path)
+            else:
+                print("⚠️ File results.csv rỗng — không có model nào để chọn.")
+        else:
+            print("⚠️ Chưa có file results.csv để đọc kết quả trước đó.")
+
+    # =====================================================
+    # 🔸 Lưu model và vectorizer chuẩn cho Flask sử dụng
+    # =====================================================
+    if best_model is not None:
+        sqli_model_path = os.path.join(save_dir, "sqli.pkl")
+        joblib.dump(best_model, sqli_model_path)
+        print(f"💾 Đã lưu model tốt nhất ({best_model_name}) -> {sqli_model_path}")
+    else:
+        print("❌ Không thể tạo sqli.pkl vì không tìm thấy model nào hợp lệ.")
+
+    # Lưu vectorizer (luôn cập nhật)
+    vectorizer_path = os.path.join(save_dir, "vectorizer.pkl")
+    joblib.dump(vectorizer, vectorizer_path)
+    print(f"💾 Đã lưu vectorizer -> {vectorizer_path}")
 
     print("\n🎯 Hoàn tất training tất cả mô hình!")
 
