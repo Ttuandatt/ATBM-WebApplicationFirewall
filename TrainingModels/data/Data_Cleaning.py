@@ -87,57 +87,74 @@ def load_all_payloads(input_dir, files_map):
             continue
 
         # Nếu là file LEGAL (non-malicious) nhiều khả năng đã có cấu trúc CSV-like -> parse bằng csv.reader
+        # if inj_type == "LEGAL":
+        #     try:
+        #         with open(p, "r", encoding="utf-8", errors="ignore") as f:
+        #             reader = csv.reader(f)
+        #             for row in reader:
+        #                 if not row:
+        #                     continue
+        #                 # We expect something like: id,payload,is_malicious,injection_type
+        #                 # But be tolerant: payload might contain commas; so handle len >= 2
+        #                 if len(row) >= 4:
+        #                     # typical case
+        #                     # id = row[0]
+        #                     payload = ",".join(row[1:-2]) if len(row) > 4 else row[1]
+        #                     # but more robust approach: assume last two columns are is_malicious and injection_type
+        #                     try:
+        #                         is_mal = int(row[-2])
+        #                     except Exception:
+        #                         # fallback if not int
+        #                         is_mal = 0
+        #                     inj_t = row[-1] if row[-1] else "LEGAL"
+        #                 elif len(row) == 3:
+        #                     # maybe id,payload,injection_type  or id,payload,is_malicious
+        #                     # We'll assume format id,payload,is_malicious
+        #                     payload = row[1]
+        #                     try:
+        #                         is_mal = int(row[2])
+        #                     except Exception:
+        #                         is_mal = 0
+        #                     inj_t = "LEGAL"
+        #                 elif len(row) == 2:
+        #                     # maybe payload,is_malicious
+        #                     payload = row[0] if row[0] else row[1]
+        #                     try:
+        #                         is_mal = int(row[1])
+        #                     except Exception:
+        #                         is_mal = 0
+        #                     inj_t = "LEGAL"
+        #                 else:
+        #                     # len(row)==1 -> it's a raw payload token (unexpected for LEGAL file), treat as payload
+        #                     payload = row[0]
+        #                     is_mal = 0
+        #                     inj_t = "LEGAL"
+
+        #                 payload = normalize_payload(payload)
+        #                 # skip truly empty
+        #                 if payload == "":
+        #                     continue
+        #                 records.append((payload, int(is_mal), inj_t))
+        #     except Exception as e:
+        #         print(f"[ERROR] Failed to parse LEGAL file {p}: {e}", file=sys.stderr)
+        #     continue
+
+        # Nếu là file LEGAL (non-malicious) -> mỗi dòng là một payload hợp pháp, không cần parse CSV
         if inj_type == "LEGAL":
             try:
                 with open(p, "r", encoding="utf-8", errors="ignore") as f:
-                    reader = csv.reader(f)
-                    for row in reader:
-                        if not row:
-                            continue
-                        # We expect something like: id,payload,is_malicious,injection_type
-                        # But be tolerant: payload might contain commas; so handle len >= 2
-                        if len(row) >= 4:
-                            # typical case
-                            # id = row[0]
-                            payload = ",".join(row[1:-2]) if len(row) > 4 else row[1]
-                            # but more robust approach: assume last two columns are is_malicious and injection_type
-                            try:
-                                is_mal = int(row[-2])
-                            except Exception:
-                                # fallback if not int
-                                is_mal = 0
-                            inj_t = row[-1] if row[-1] else "LEGAL"
-                        elif len(row) == 3:
-                            # maybe id,payload,injection_type  or id,payload,is_malicious
-                            # We'll assume format id,payload,is_malicious
-                            payload = row[1]
-                            try:
-                                is_mal = int(row[2])
-                            except Exception:
-                                is_mal = 0
-                            inj_t = "LEGAL"
-                        elif len(row) == 2:
-                            # maybe payload,is_malicious
-                            payload = row[0] if row[0] else row[1]
-                            try:
-                                is_mal = int(row[1])
-                            except Exception:
-                                is_mal = 0
-                            inj_t = "LEGAL"
-                        else:
-                            # len(row)==1 -> it's a raw payload token (unexpected for LEGAL file), treat as payload
-                            payload = row[0]
-                            is_mal = 0
-                            inj_t = "LEGAL"
+                    lines = f.readlines()
 
-                        payload = normalize_payload(payload)
-                        # skip truly empty
-                        if payload == "":
-                            continue
-                        records.append((payload, int(is_mal), inj_t))
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        continue  # bỏ dòng trống
+                    payload = normalize_payload(line)
+                    records.append((payload, 0, "LEGAL"))  # hợp pháp -> is_malicious = 0
             except Exception as e:
                 print(f"[ERROR] Failed to parse LEGAL file {p}: {e}", file=sys.stderr)
-            continue
+            continue  # sang file kế tiếp
+
 
         # else: treat each line as a payload text, label=1
         lines = read_lines_preserve_whitespace(p)
