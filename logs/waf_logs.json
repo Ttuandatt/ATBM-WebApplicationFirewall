@@ -1,2 +1,0 @@
-{"timestamp": "2025-11-10T21:32:25.547340", "ip": "127.0.0.1", "method": "GET", "path": "/", "payloads": [], "violation": null, "ml_result": null}
-{"timestamp": "2025-11-10T21:32:25.657411", "ip": "127.0.0.1", "method": "GET", "path": "/favicon.ico", "payloads": ["favicon.ico"], "violation": null, "ml_result": null}

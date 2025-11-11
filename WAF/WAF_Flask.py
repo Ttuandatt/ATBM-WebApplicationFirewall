@@ -1,504 +1,194 @@
-# # WAF/WAF_Flask.py
-# from flask import request, jsonify
-# from WAF import SQLInjectionWAF_AI
-# import os
-# from urllib.parse import unquote
-# import numpy as np
-# import glob
-# import json
-# 
-# # --- Cập nhật đường dẫn tuyệt đối tới thư mục saved_models ---
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# base_model_dir = os.path.join(current_dir, '..', 'TrainingModels', 'BinaryClassification', 'saved_models')
-# base_model_dir = os.path.abspath(base_model_dir)
-# # ------------------------------------------------------------
-# 
-# # Danh sách attacks mà middleware sẽ load (tên phải tương ứng với folder trong saved_models)
-# ATTACK_NAMES = ['SQLInjection', 'XSS']
-# 
-# def find_vectorizer_file(attack_dir):
-#     """
-#     Tìm file vectorizer trong attack_dir.
-#     Trả về đường dẫn hoặc None.
-#     """
-#     # tìm các file có tên chứa 'vectorizer' (không phân biệt hoa thường)
-#     candidates = []
-#     for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
-#         if 'vectorizer' in os.path.basename(p).lower():
-#             candidates.append(p)
-#     if candidates:
-#         # trả file đầu tiên tìm được
-#         return candidates[0]
-#     # fallback: tìm file tên 'vectorizer.pkl'
-#     fallback = os.path.join(attack_dir, 'vectorizer.pkl')
-#     if os.path.exists(fallback):
-#         return fallback
-#     return None
-# 
-# def find_model_file(attack_dir):
-#     """
-#     Tìm file model phù hợp trong attack_dir.
-#     Cố gắng chọn file rõ ràng (ví dụ sqli.pkl, *_xss.pkl), nếu không thì trả file .pkl đầu tiên không phải vectorizer.
-#     """
-#     # ưu tiên các file có tên attack (case-insensitive)
-#     attack_name_lower = os.path.basename(attack_dir).lower()
-#     for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
-#         name = os.path.basename(p).lower()
-#         # skip vectorizer files
-#         if 'vectorizer' in name:
-#             continue
-#         if attack_name_lower in name:
-#             return p
-#     # fallback: trả file .pkl đầu tiên không phải vectorizer
-#     for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
-#         name = os.path.basename(p).lower()
-#         if 'vectorizer' in name:
-#             continue
-#         return p
-#     return None
-# 
-# def load_detectors():
-#     """
-#     Load detector instances for all ATTACK_NAMES.
-#     Trả về dict attack_name -> detector instance (hoặc None nếu load fail).
-#     """
-#     detectors = {}
-#     for attack in ATTACK_NAMES:
-#         attack_dir = os.path.join(base_model_dir, attack)
-#         if not os.path.isdir(attack_dir):
-#             print(f"[WAF] Warning at WAF/WAF_Flask.py/load_detectors(): attack dir not found: {attack_dir}. Skipping {attack}.")
-#             detectors[attack] = None
-#             continue
-# 
-#         model_file = find_model_file(attack_dir)
-#         vectorizer_file = find_vectorizer_file(attack_dir)
-# 
-#         # if not found a model file but there's a common-named model in parent (e.g., sqli.pkl)
-#         if model_file is None:
-#             # try searching parent saved_models dir for files that mention attack
-#             for p in glob.glob(os.path.join(base_model_dir, '*', '*.pkl')):
-#                 if attack.lower() in os.path.basename(p).lower() and 'vectorizer' not in os.path.basename(p).lower():
-#                     model_file = p
-#                     break
-# 
-#         # fallback to generic names
-#         if model_file is None:
-#             print(f"[WAF] No model .pkl found for {attack} in {attack_dir}. Skipping load.")
-#             detectors[attack] = None
-#             continue
-# 
-#         if vectorizer_file is None:
-#             # try parent dir 'SQLInjection' vectorizer as fallback for XSS (in case only one vectorizer was saved)
-#             fallback_vec = os.path.join(base_model_dir, 'SQLInjection', 'vectorizer.pkl')
-#             if os.path.exists(fallback_vec):
-#                 vectorizer_file = fallback_vec
-# 
-#         print(f"[WAF] Loading {attack}: model={model_file}, vectorizer={vectorizer_file}")
-#         try:
-#             detector = SQLInjectionWAF_AI(model_file, vectorizer_file)
-#             detectors[attack] = detector
-#         except Exception as e:
-#             print(f"[WAF] Error loading detector for {attack}: {e}")
-#             detectors[attack] = None
-#     return detectors
-# 
-# # load detectors on import
-# _DETECTORS = load_detectors()
-# 
-# def extract_payloads_from_request(req):
-#     """
-#     Lấy tất cả payloads khả dĩ từ request để kiểm tra:
-#       - path segments (cuối path)
-#       - tất cả giá trị trong query string (request.args)
-#       - tất cả giá trị trong form (request.form)
-#       - JSON body (nếu có)
-#       - raw body (request.get_data())
-#     Trả về list các chuỗi (decoded).
-#     """
-#     payloads = []
-# 
-#     try:
-#         # path last segment
-#         path = req.path or ''
-#         try:
-#             decoded_path = unquote(path)
-#         except:
-#             decoded_path = path
-#         last_segment = decoded_path.split('/')[-1]
-#         if last_segment:
-#             payloads.append(last_segment)
-# 
-#         # query params
-#         for k, v in req.args.items():
-#             if v:
-#                 payloads.append(unquote(v))
-# 
-#         # form data
-#         for k, v in req.form.items():
-#             if v:
-#                 payloads.append(unquote(v))
-# 
-#         # json body
-#         try:
-#             json_body = req.get_json(silent=True)
-#             if isinstance(json_body, dict):
-#                 for k, v in json_body.items():
-#                     if isinstance(v, str) and v.strip():
-#                         payloads.append(v)
-#                     else:
-#                         # if value is list/dict -> stringify
-#                         payloads.append(json.dumps(v, ensure_ascii=False))
-#             elif isinstance(json_body, list):
-#                 payloads.append(json.dumps(json_body, ensure_ascii=False))
-#         except Exception:
-#             pass
-# 
-#         # raw body
-#         try:
-#             raw = req.get_data(as_text=True)
-#             if raw and raw.strip():
-#                 payloads.append(unquote(raw))
-#         except Exception:
-#             pass
-# 
-#     except Exception as e:
-#         print(f"[WAF] Error extracting payloads: {e}")
-# 
-#     # deduplicate and filter empty
-#     cleaned = []
-#     seen = set()
-#     for p in payloads:
-#         if not p:
-#             continue
-#         s = p.strip()
-#         if not s:
-#             continue
-#         if s in seen:
-#             continue
-#         seen.add(s)
-#         cleaned.append(s)
-#     return cleaned
-# 
-# def preprocess_single_payload(payload, vectorizer):
-#     """
-#     Vectorize a single payload using provided vectorizer.
-#     Trả về numpy array suitable for model.predict or None nếu không meaningful.
-#     """
-#     if not vectorizer:
-#         print("[WAF] No vectorizer provided for this detector. Skipping vectorize.")
-#         return None
-#     try:
-#         vec = vectorizer.transform([payload]).toarray()
-#         if not np.any(vec):
-#             # no tokens matched
-#             return None
-#         return vec
-#     except Exception as e:
-#         print(f"[WAF] Error vectorizing payload: {e}")
-#         return None
-# 
-# def rusicadeWAF_AI(app):
-#     """
-#     Register before_request handler to monitor incoming requests for multiple attack detectors.
-#     """
-#     @app.before_request
-#     def monitor_request():
-#         client_ip = request.remote_addr
-#         print(f"[WAF] Client IP: {client_ip}")
-#         payloads = extract_payloads_from_request(request)
-#         if not payloads:
-#             # nothing to check
-#             return None
-# 
-#         # iterate detectors
-#         for attack_name, detector in _DETECTORS.items():
-#             if detector is None:
-#                 # not loaded
-#                 continue
-# 
-#             for payload in payloads:
-#                 preprocessed = preprocess_single_payload(payload, detector.vectorizer)
-#                 if preprocessed is None:
-#                     # nothing meaningful for this payload & detector
-#                     continue
-# 
-#                 try:
-#                     prediction = detector.model.predict(preprocessed) if detector.model is not None else [0]
-#                     print(f"[WAF] Attack={attack_name} payload='{payload}' prediction={prediction}")
-#                     if hasattr(prediction, '__len__') and prediction[0] == 1:
-#                         # call block feature (will check admin inside)
-#                         try:
-#                             detector.block_ips_feature(client_ip)
-#                         except Exception as e:
-#                             print(f"[WAF] Error blocking IP: {e}")
-#                         # return blocking page
-#                         return """
-#                         <html>
-#                             <head><title>Access Denied :Rusicade WAF_AI</title></head>
-#                             <body>
-#                                 <h1 style="color:red"> Rusicade WAF_AI - Web Application Firewall</h1>
-#                                 <h2>Error: Potential {attack} Detected!</h2>
-#                                 <p>Your request has been blocked due to suspicious activity.</p>
-#                             </body>
-#                         </html>
-#                         """.format(attack=attack_name), 400
-#                 except Exception as e:
-#                     print(f"[WAF] Error during prediction for {attack_name}: {e}")
-#                     continue
-# 
-#         # if none matched, allow request
-#         return None
-
-
 # WAF/WAF_Flask.py
-from flask import request, jsonify
+from flask import request, jsonify, Flask
 from WAF import AdaptiveWAF_AI
 import os
 from urllib.parse import unquote
-import numpy as np
 import glob
 import json
 
 # --- Cập nhật đường dẫn tuyệt đối tới thư mục saved_models ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
-base_model_dir = os.path.join(current_dir, '..', 'TrainingModels', 'BinaryClassification', 'saved_models')
+base_model_dir = os.path.join(
+    current_dir, '..', 'TrainingModels', 'BinaryClassification', 'saved_models'
+)
 base_model_dir = os.path.abspath(base_model_dir)
 # ------------------------------------------------------------
 
-# Danh sách attacks mà middleware sẽ load (tên phải tương ứng với folder trong saved_models)
+# Danh sách các loại tấn công sẽ được load (tên folder trong saved_models)
 ATTACK_NAMES = ['AdaptiveWAF']
 
-def find_vectorizer_file(attack_dir):
-    """
-    Tìm file vectorizer trong attack_dir.
-    Trả về đường dẫn hoặc None.
-    """
-    # tìm các file có tên chứa 'vectorizer' (không phân biệt hoa thường)
-    candidates = []
-    for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
-        if 'vectorizer' in os.path.basename(p).lower():
-            candidates.append(p)
-    if candidates:
-        # trả file đầu tiên tìm được
-        return candidates[0]
-    # fallback: tìm file tên 'vectorizer.pkl'
-    fallback = os.path.join(attack_dir, 'vectorizer.pkl')
-    if os.path.exists(fallback):
-        return fallback
-    return None
 
 def find_model_file(attack_dir):
     """
-    Tìm file model phù hợp trong attack_dir.
-    Cố gắng chọn file rõ ràng (ví dụ waf_model.pkl), nếu không thì trả file .pkl đầu tiên không phải vectorizer.
+    Tìm file model .pkl trong attack_dir.
+    Ưu tiên: waf_model.pkl → *.pkl (không phải vectorizer)
     """
-    # ưu tiên các file có tên attack (case-insensitive)
-    attack_name_lower = os.path.basename(attack_dir).lower()
+    preferred = os.path.join(attack_dir, 'waf_model.pkl')
+    if os.path.exists(preferred):
+        return preferred
+
+    # Tìm file .pkl nào không chứa 'vectorizer'
     for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
         name = os.path.basename(p).lower()
-        # skip vectorizer files
-        if 'vectorizer' in name:
-            continue
-        if attack_name_lower in name:
+        if 'vectorizer' not in name:
             return p
-    # fallback: trả file .pkl đầu tiên không phải vectorizer
-    for p in glob.glob(os.path.join(attack_dir, '*.pkl')):
-        name = os.path.basename(p).lower()
-        if 'vectorizer' in name:
-            continue
-        return p
+
     return None
+
 
 def load_detectors():
     """
-    Load detector instances for all ATTACK_NAMES.
-    Trả về dict attack_name -> detector instance (hoặc None nếu load fail).
+    Load tất cả detector cho các ATTACK_NAMES.
+    Trả về dict: attack_name → AdaptiveWAF_AI instance (hoặc None nếu lỗi)
     """
     detectors = {}
     for attack in ATTACK_NAMES:
         attack_dir = os.path.join(base_model_dir, attack)
         if not os.path.isdir(attack_dir):
-            print(f"[WAF] Warning: attack dir not found: {attack_dir}. Skipping {attack}.")
+            print(f"[WAF] Warning: Directory not found: {attack_dir}. Skipping {attack}.")
             detectors[attack] = None
             continue
 
         model_file = find_model_file(attack_dir)
-        vectorizer_file = find_vectorizer_file(attack_dir)
-
-        # if not found a model file but there's a common-named model in parent (e.g., sqli.pkl)
         if model_file is None:
-            # try searching parent saved_models dir for files that mention attack
-            for p in glob.glob(os.path.join(base_model_dir, '*', '*.pkl')):
-                if attack.lower() in os.path.basename(p).lower() and 'vectorizer' not in os.path.basename(p).lower():
-                    model_file = p
-                    break
-
-        # fallback to generic names
-        if model_file is None:
-            print(f"[WAF] No model .pkl found for {attack} in {attack_dir}. Skipping load.")
+            print(f"[WAF] No valid model file found in {attack_dir}. Skipping.")
             detectors[attack] = None
             continue
 
-        # if vectorizer_file is None:
-        #     # try parent dir 'SQLInjection' vectorizer as fallback for XSS (in case only one vectorizer was saved)
-        #     fallback_vec = os.path.join(base_model_dir, 'SQLInjection', 'vectorizer.pkl')
-        #     if os.path.exists(fallback_vec):
-        #         vectorizer_file = fallback_vec
-
-        print(f"[WAF] Loading {attack}: model={model_file}, vectorizer={vectorizer_file}")
+        print(f"[WAF] Loading detector: {attack} → {model_file}")
         try:
-            detector = AdaptiveWAF_AI(model_file, vectorizer_file)
+            # vectorizer_path = None → không cần load riêng
+            detector = AdaptiveWAF_AI(model_file, vectorizer_path=None)
             detectors[attack] = detector
         except Exception as e:
             print(f"[WAF] Error loading detector for {attack}: {e}")
             detectors[attack] = None
+
     return detectors
 
-# load detectors on import
+
+# Load detectors khi import module
 _DETECTORS = load_detectors()
+
 
 def extract_payloads_from_request(req):
     """
-    Lấy tất cả payloads khả dĩ từ request để kiểm tra:
-      - path segments (cuối path)
-      - tất cả giá trị trong query string (request.args)
-      - tất cả giá trị trong form (request.form)
-      - JSON body (nếu có)
-      - raw body (request.get_data())
-    Trả về list các chuỗi (decoded).
+    Trích xuất tất cả payload khả nghi từ request:
+    - path segment cuối
+    - query params
+    - form data
+    - JSON body
+    - raw body
     """
-    payloads = []
+    payloads = set()
 
     try:
-        # path last segment
+        # 1. Path cuối
         path = req.path or ''
-        try:
-            decoded_path = unquote(path)
-        except:
-            decoded_path = path
-        last_segment = decoded_path.split('/')[-1]
-        if last_segment:
-            payloads.append(last_segment)
+        decoded_path = unquote(path)
+        last_seg = decoded_path.strip('/').split('/')[-1]
+        if last_seg:
+            payloads.add(last_seg)
 
-        # query params
-        for k, v in req.args.items():
-            if v:
-                payloads.append(unquote(v))
+        # 2. Query params
+        for v in req.args.values():
+            if v := v.strip():
+                payloads.add(unquote(v))
 
-        # form data
-        for k, v in req.form.items():
-            if v:
-                payloads.append(unquote(v))
+        # 3. Form data
+        for v in req.form.values():
+            if v := v.strip():
+                payloads.add(unquote(v))
 
-        # json body
+        # 4. JSON body
         try:
             json_body = req.get_json(silent=True)
             if isinstance(json_body, dict):
-                for k, v in json_body.items():
+                for v in json_body.values():
                     if isinstance(v, str) and v.strip():
-                        payloads.append(v)
+                        payloads.add(v.strip())
                     else:
-                        # if value is list/dict -> stringify
-                        payloads.append(json.dumps(v, ensure_ascii=False))
-            elif isinstance(json_body, list):
-                payloads.append(json.dumps(json_body, ensure_ascii=False))
-        except Exception:
+                        payloads.add(json.dumps(v, ensure_ascii=False))
+            elif isinstance(json_body, (list, str)) and json_body:
+                payloads.add(json.dumps(json_body, ensure_ascii=False))
+        except:
             pass
 
-        # raw body
+        # 5. Raw body
         try:
             raw = req.get_data(as_text=True)
-            if raw and raw.strip():
-                payloads.append(unquote(raw))
-        except Exception:
+            if raw := raw.strip():
+                payloads.add(unquote(raw))
+        except:
             pass
 
     except Exception as e:
         print(f"[WAF] Error extracting payloads: {e}")
 
-    # deduplicate and filter empty
-    cleaned = []
-    seen = set()
-    for p in payloads:
-        if not p:
-            continue
-        s = p.strip()
-        if not s:
-            continue
-        if s in seen:
-            continue
-        seen.add(s)
-        cleaned.append(s)
-    return cleaned
+    return [p for p in payloads if p]
 
-def preprocess_single_payload(payload, vectorizer):
-    """
-    Vectorize a single payload using provided vectorizer.
-    Trả về numpy array suitable for model.predict or None nếu không meaningful.
-    """
-    if not vectorizer:
-        print("[WAF] No vectorizer provided for this detector. Skipping vectorize.")
-        return None
-    try:
-        vec = vectorizer.transform([payload]).toarray()
-        if not np.any(vec):
-            # no tokens matched
-            return None
-        return vec
-    except Exception as e:
-        print(f"[WAF] Error vectorizing payload: {e}")
-        return None
 
-def rusicadeWAF_AI(app):
+def rusicadeWAF_AI(app: Flask):
     """
-    Register before_request handler to monitor incoming requests for multiple attack detectors.
+    Middleware WAF: Kiểm tra request trước khi xử lý.
+    Chặn nếu phát hiện tấn công.
     """
+
     @app.before_request
     def monitor_request():
-        client_ip = request.remote_addr
-        print(f"[WAF] Client IP: {client_ip}")
+        client_ip = request.remote_addr or "unknown"
+        print(f"\n[WAF] Incoming request from IP: {client_ip}")
+        print(f"[WAF] URL: {request.url}")
+
         payloads = extract_payloads_from_request(request)
         if not payloads:
-            # nothing to check
-            return None
+            return None  # Không có gì để kiểm tra
 
-        # iterate detectors
+        print(f"[WAF] Extracted {len(payloads)} payload(s) to check.")
+
+        # Kiểm tra từng detector
         for attack_name, detector in _DETECTORS.items():
             if detector is None:
-                # not loaded
                 continue
 
             for payload in payloads:
-                preprocessed = preprocess_single_payload(payload, detector.vectorizer)
-                if preprocessed is None:
-                    # nothing meaningful for this payload & detector
-                    continue
-
+                print(f"[WAF] Checking payload with {attack_name}: '{payload}'")
                 try:
-                    prediction = detector.model.predict(preprocessed) if detector.model is not None else [0]
-                    print(f"[WAF] Attack={attack_name} payload='{payload}' prediction={prediction}")
-                    if hasattr(prediction, '__len__') and prediction[0] == 1:
-                        # call block feature (will check admin inside)
-                        try:
-                            detector.block_ips_feature(client_ip)
-                        except Exception as e:
-                            print(f"[WAF] Error blocking IP: {e}")
-                        # return blocking page
-                        return """
-                        <html>
-                            <head><title>Access Denied :Rusicade WAF_AI</title></head>
-                            <body>
-                                <h1 style="color:red"> Rusicade WAF_AI - Web Application Firewall</h1>
-                                # <h2>Error: Potential {attack} Detected!</h2>
-                                <h2>Error: Potential attack Detected!</h2>
-                                <p>Your request has been blocked due to suspicious activity.</p>
-                            </body>
-                        </html>
-                        """.format(attack=attack_name), 400
+                    if detector.detect(payload, client_ip):
+                        print(f"[WAF] MALICIOUS PAYLOAD DETECTED! Blocking IP: {client_ip}")
+                        return (
+                            f"""
+                            <html>
+                                <head>
+                                    <title>Access Denied - Rusicade WAF_AI</title>
+                                    <style>
+                                        body {{ font-family: Arial; text-align: center; padding: 50px; background: #f0f0f0; }}
+                                        .box {{ background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; }}
+                                        h1 {{ color: #d32f2f; }}
+                                        h2 {{ color: #333; }}
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="box">
+                                        <h1>Rusicade WAF_AI</h1>
+                                        <h2>Potential Attack Detected!</h2>
+                                        <p><strong>Attack Type:</strong> {attack_name}</p>
+                                        <p><strong>Payload:</strong> <code>{payload}</code></p>
+                                        <p>Your IP <strong>{client_ip}</strong> has been blocked.</p>
+                                        <hr>
+                                        <small>Contact admin if this is a mistake.</small>
+                                    </div>
+                                </body>
+                            </html>
+                            """,
+                            400
+                        )
                 except Exception as e:
-                    print(f"[WAF] Error during prediction for {attack_name}: {e}")
+                    print(f"[WAF] Error in detection for {attack_name}: {e}")
                     continue
 
-        # if none matched, allow request
+        # Nếu không phát hiện tấn công
+        print(f"[WAF] Request from {client_ip} is CLEAN.")
         return None
 
+    return app
