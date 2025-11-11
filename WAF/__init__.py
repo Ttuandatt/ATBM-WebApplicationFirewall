@@ -82,7 +82,7 @@ class WAF_AI(ABC):
     def detect(self, path):
         pass
 
-class SQLInjectionWAF_AI(WAF_AI):
+class AdaptiveWAF_AI(WAF_AI):
     def detect(self, path,ip):
         if path is None:
             return False  # No meaningful tokens, assume no SQL injection
