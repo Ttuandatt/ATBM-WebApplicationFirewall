@@ -26,3 +26,9 @@ python -m WAF.FlaskSimpleTest
 # Hoặc cd vào WAF rồi chạy file (sau khi activated venv)
 cd WAF
 python FlaskSimpleTest.py
+
+
+
+12/11/2025 (tuandat):
+Demo:
+1. XSS Payload:

@@ -184,7 +184,7 @@ def main():
     if model_already_trained(results_df, model_name):
         print(f"Model {model_name} đã được train trước đó. Bỏ qua.")
     else:
-        print(f"\nTraining {model_name} (có thể mất 1-3 phút với 150k mẫu)...")
+        print(f"\nTraining {model_name} (150k mẫu)...")
         pipe.fit(X_train, y_train)
 
         y_pred = pipe.predict(X_test)

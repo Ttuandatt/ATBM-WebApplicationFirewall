@@ -1,6 +1,6 @@
 # WAF/FlaskSimpleTest.py
 from WAF.RuleEngine import is_malicious_rule  # import hàm từ RuleEngine.py
-from flask import Flask, request, render_template, render_template_string
+from flask import Flask, request, render_template, render_template_string, jsonify, make_response
 import os, json, time, re, pandas as pd, joblib
 from WAF import RetrainModule
 
@@ -34,6 +34,7 @@ def predict_payload_ml(payload):
             "label": "MALICIOUS" if pred else "LEGAL"
         }
     except Exception as e:
+        # If ML fails, treat as non-malicious but log error (alternatively you may want to fail-closed)
         return {"is_malicious": False, "probability": 0.0, "label": "ERROR"}
 
 # === Logging ===
@@ -61,7 +62,37 @@ def log_request(payload, ip, method, detection_type, label, probability, rule_pa
 
 # === Flask app ===
 app = Flask(__name__)
-HTML_TEMPLATE = open(os.path.join(os.path.dirname(__file__), "templates", "dashboard.html")).read()
+HTML_TEMPLATE = open(
+    os.path.join(os.path.dirname(__file__), "templates", "dashboard.html"),
+    encoding="utf-8"
+).read()
+
+def respond_blocked(original_payload, ip, detection_source, reason):
+    """
+    Helper to build a blocked response. Returns (response, status_code).
+    If client expects JSON, returns JSON; otherwise returns rendered dashboard HTML with popup.
+    """
+    result = {
+        "payload": original_payload,
+        "is_malicious": True,
+        "probability": 1.0,
+        "label": f"MALICIOUS ({detection_source})",
+        "rule": reason
+    }
+    # Log already done by caller; but ensure consistent logging if needed.
+    accept = request.headers.get("Accept", "")
+    headers = {"X-WAF-Blocked": "true", "X-WAF-Reason": str(reason)}
+    if "application/json" in accept:
+        resp = make_response(jsonify({"blocked": True, "reason": reason, "payload": original_payload}), 403)
+        for k, v in headers.items():
+            resp.headers[k] = v
+        return resp
+    else:
+        # render dashboard template with popup (403)
+        resp = make_response(render_template_string(HTML_TEMPLATE, result=result), 403)
+        for k, v in headers.items():
+            resp.headers[k] = v
+        return resp
 
 @app.route("/")
 def home():
@@ -74,31 +105,44 @@ def test_payload():
     if not payload:
         return render_template_string(HTML_TEMPLATE, result=None)
 
-    # 1️⃣ Rule check
+    # 1️⃣ Rule check (fast, deterministic)
     rule_hit, pattern = is_malicious_rule(payload)
     if rule_hit:
-        result = {"payload": payload, "is_malicious": True, "probability": 1.0, "label": "MALICIOUS (Rule-Based)"}
-        log_request(payload, ip, "GET", "rule", result["label"], result["probability"], rule_pattern=pattern)
-    else:
-        # 2️⃣ ML prediction
-        result_ml = predict_payload_ml(payload)
-        result = {**result_ml, "payload": payload}
-        log_request(payload, ip, "GET", "ml", result["label"], result["probability"])
+        # Log detection
+        log_request(payload, ip, "GET", "rule", f"MALICIOUS (Rule-Based)", 1.0, rule_pattern=pattern)
+        # Immediately block and return 403 (no further processing)
+        return respond_blocked(payload, ip, "Rule-Based", pattern)
 
+    # 2️⃣ ML prediction (only if no rule hit)
+    result_ml = predict_payload_ml(payload)
+    # If ML thinks it's malicious, block as well
+    if result_ml.get("is_malicious"):
+        log_request(payload, ip, "GET", "ml", "MALICIOUS (ML)", result_ml.get("probability"))
+        return respond_blocked(payload, ip, "ML", "ML-Predicted")
+
+    # If not malicious, proceed and render result normally
+    result = {**result_ml, "payload": payload}
+    log_request(payload, ip, "GET", "ml", result["label"], result["probability"])
     return render_template_string(HTML_TEMPLATE, result=result)
 
 @app.route("/user/<path:payload>")
 def user_payload(payload):
     ip = request.remote_addr or "unknown"
+
+    # Rule check
     rule_hit, pattern = is_malicious_rule(payload)
     if rule_hit:
-        result = {"payload": payload, "is_malicious": True, "probability": 1.0, "label": "MALICIOUS (Rule-Based)"}
-        log_request(payload, ip, "GET", "rule", result["label"], result["probability"], rule_pattern=pattern)
-    else:
-        result_ml = predict_payload_ml(payload)
-        result = {**result_ml, "payload": payload}
-        log_request(payload, ip, "GET", "ml", result["label"], result["probability"])
+        log_request(payload, ip, "GET", "rule", f"MALICIOUS (Rule-Based)", 1.0, rule_pattern=pattern)
+        return respond_blocked(payload, ip, "Rule-Based", pattern)
 
+    # ML
+    result_ml = predict_payload_ml(payload)
+    if result_ml.get("is_malicious"):
+        log_request(payload, ip, "GET", "ml", "MALICIOUS (ML)", result_ml.get("probability"))
+        return respond_blocked(payload, ip, "ML", "ML-Predicted")
+
+    result = {**result_ml, "payload": payload}
+    log_request(payload, ip, "GET", "ml", result["label"], result["probability"])
     return render_template_string(HTML_TEMPLATE, result=result)
 
 # ====== Retrain Dashboard ======
