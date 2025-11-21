@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Phiên bản TỐI ƯU 2025 cho Adaptive WAF:
-- LightGBM + char n-gram TF-IDF (2-5)
+Phiên bản TỐI ƯU 2025 cho Adaptive WAF (XGBoost):
+- XGBoost + char n-gram TF-IDF (2-5)
 - Feature phụ: độ dài + tỷ lệ ký tự đặc biệt
-- Xử lý mất cân bằng: class_weight='balanced'
+- Xử lý mất cân bằng: scale_pos_weight
 - Pipeline đầy đủ, dễ deploy
 - Tính FN, FP + Luôn train lại + Chỉ lưu model nếu recall tốt nhất
 """
@@ -19,7 +19,7 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score, con
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline as SklearnPipeline
-from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
 import re
 import shutil
 from datetime import datetime
@@ -79,10 +79,10 @@ def save_result(results_path, model_name, acc, f1_macro, f1_min, recall_min, fn,
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(results_path, index=False)
     print(f"Đã lưu kết quả {model_name}_v{version} → {results_path}")
-    return df  # Trả về df đã cập nhật
+    return df
 
 def get_next_version(results_df, model_name):
-    """Tìm version tiếp theo (model_name_v1, v2, ...)"""
+    """Tìm version tiếp theo (xgboost_v1, v2, ...)"""
     existing = results_df[results_df["model"].str.startswith(model_name + "_v")]
     if existing.empty:
         return 1
@@ -145,6 +145,12 @@ def main():
     print("Phân bố nhãn:")
     print(df['is_malicious'].value_counts())
 
+    # Tính scale_pos_weight cho XGBoost
+    neg_count = (df['is_malicious'] == 0).sum()
+    pos_count = (df['is_malicious'] == 1).sum()
+    scale_pos_weight = neg_count / pos_count if pos_count > 0 else 1.0
+    print(f"scale_pos_weight = {scale_pos_weight:.2f} (neg: {neg_count}, pos: {pos_count})")
+
     # Thêm feature phụ
     df = add_features(df)
 
@@ -156,7 +162,7 @@ def main():
     )
 
     # =====================================================
-    # Pipeline TỐI ƯU cho WAF
+    # Pipeline TỐI ƯU cho WAF (XGBoost + TF-IDF)
     # =====================================================
     tfidf = TfidfVectorizer(
         analyzer='char',
@@ -172,18 +178,20 @@ def main():
         ('numeric', 'passthrough', ['payload_length', 'special_chars_ratio'])
     ], remainder='drop')
 
-    model = LGBMClassifier(
+    model = XGBClassifier(
         n_estimators=1200,
         learning_rate=0.05,
-        max_depth=-1,
-        num_leaves=256,
-        colsample_bytree=0.8,
+        max_depth=8,
+        min_child_weight=1,
         subsample=0.9,
+        colsample_bytree=0.8,
         reg_lambda=1.5,
-        class_weight='balanced',
+        scale_pos_weight=scale_pos_weight,  # Xử lý mất cân bằng
         random_state=42,
         n_jobs=-1,
-        verbose=-1
+        verbosity=0,
+        eval_metric='logloss',
+        tree_method='hist'  # Tối ưu tốc độ
     )
 
     pipe = SklearnPipeline([
@@ -199,7 +207,7 @@ def main():
     results_df = load_previous_results(results_path)
 
     # Lấy version mới (luôn train lại)
-    base_model_name = "lightgbm"
+    base_model_name = "xgboost"
     version = get_next_version(results_df, base_model_name)
     model_name = f"{base_model_name}_v{version}"
     model_path = os.path.join(save_dir, f"{model_name}.pkl")
@@ -240,30 +248,30 @@ def main():
     )
 
     # =====================================================
-    # CHỈ LƯU LẠI waf_model.pkl NẾU RECALL TỐT NHẤT
+    # CHỈ LƯU LẠI waf_model.pkl NẾU RECALL TỐT NHẤT (trong XGBoost)
     # =====================================================
     final_model_path = os.path.join(save_dir, "waf_model.pkl")
     final_preprocessor_path = os.path.join(save_dir, "vectorizer.pkl")
 
-    # Lọc các model lightgbm
-    lightgbm_results = results_df[results_df["model"].str.startswith("lightgbm_v")]
-    if not lightgbm_results.empty:
-        best_recall = lightgbm_results["recall_malicious"].max()
+    # Lọc các model XGBoost
+    # results_df = load_previous_results(results_path)
+    if not results_df["model"].empty:
+        best_recall = results_df["recall_malicious"].max()
         if recall_malicious >= best_recall:
-            print(f"\nMODEL MỚI CÓ RECALL TỐT NHẤT ({recall_malicious:.5f}) → Lưu vào waf_model.pkl")
+            print(f"\nMODEL CÓ RECALL TỐT NHẤT ({recall_malicious:.5f}) → Lưu vào waf_model.pkl")
             shutil.copy(model_path, final_model_path)
             shutil.copy(preprocessor_path, final_preprocessor_path)
             print(f"   → {final_model_path}")
             print(f"   → {final_preprocessor_path}")
         else:
-            print(f"\nModel mới recall {recall_malicious:.5f} < best {best_recall:.5f} → Không cập nhật waf_model.pkl")
+            print(f"\nXGBoost mới recall {recall_malicious:.5f} < best {best_recall:.5f} → Không cập nhật waf_model.pkl")
     else:
         # Lần đầu tiên
-        print("\nLần đầu train → Lưu waf_model.pkl")
+        print("\nLần đầu train XGBoost → Lưu waf_model.pkl")
         shutil.copy(model_path, final_model_path)
         shutil.copy(preprocessor_path, final_preprocessor_path)
 
-    print("\nHOÀN TẤT! WAF ML Model đã sẵn sàng cho production.")
+    print("\nHOÀN TẤT! XGBoost WAF Model đã sẵn sàng cho production.")
 
 if __name__ == "__main__":
     main()

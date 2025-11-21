@@ -140485,3 +140485,10 @@ index,payload,is_malicious,injection_type
 140483,zoologist,0,LEGAL
 140484,zoology,0,LEGAL
 140485,username,0,LEGAL
+140486,SELECT * FROM items UNION users,1,MALICIOUS
+140487,SELECT * FROM items WHERE owner = 'wiley' AND itemname = 'name' OR 'a'='a';,1,MALICIOUS
+140488,"""name'); DELETE FROM items; --""",1,MALICIOUS
+140489,"<% String eid = request.getParameter(""eid""); %> ... Employee ID: <%= eid %>",1,MALICIOUS
+140490,SELECT * FROM items WHERE owner = 'hacker' AND itemname = 'name';  DELETE FROM items;  --',1,MALICIOUS
+140491,SELECT * FROM items WHERE owner = 'hacker' AND itemname = 'name';  DELETE FROM items;  SELECT * FROM items WHERE 'a'='a';,1,MALICIOUS
+140492,"<%…  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(""select * from emp where id=""+eid);  if (rs != null) {   rs.next();   String name = rs.getString(""name""); %>  Employee Name: <%= name %>",1,MALICIOUS

@@ -418,5 +418,95 @@
     "rule_pattern": null,
     "label": "MALICIOUS (ML)",
     "probability": 0.9999999326646093
+  },
+  {
+    "timestamp": "2025-11-12 22:35:50",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "Danny",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "LEGAL",
+    "probability": 0.0014981705371917469
+  },
+  {
+    "timestamp": "2025-11-12 22:36:05",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "SELECT * FROM items WHERE owner = 'wiley' AND itemname = 'name' OR 'a'='a';",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "MALICIOUS (ML)",
+    "probability": 0.9999999326646093
+  },
+  {
+    "timestamp": "2025-11-21 08:53:09",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "danny",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "LEGAL",
+    "probability": 0.0014981705371917469
+  },
+  {
+    "timestamp": "2025-11-21 08:57:40",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "danny",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "LEGAL",
+    "probability": 0.0014981705371917469
+  },
+  {
+    "timestamp": "2025-11-21 08:57:52",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "SELECT * FROM items WHERE owner = 'wiley' AND itemname = 'name' OR 'a'='a';",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "MALICIOUS (ML)",
+    "probability": 0.9999999326646093
+  },
+  {
+    "timestamp": "2025-11-21 08:58:26",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "SELECT * FROM items WHERE owner = 'wiley' AND itemname = 'name' OR 'a'='a';",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "MALICIOUS (ML)",
+    "probability": 0.9999999326646093
+  },
+  {
+    "timestamp": "2025-11-21 16:51:19",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "danny",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "LEGAL",
+    "probability": 0.0014981705371917469
+  },
+  {
+    "timestamp": "2025-11-21 16:51:32",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "SELECT * FROM items WHERE owner = 'hacker' AND itemname = 'name';  DELETE FROM items;  --'",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "MALICIOUS (ML)",
+    "probability": 0.9999997656016345
+  },
+  {
+    "timestamp": "2025-11-21 16:52:01",
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "payload": "<%…  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(\"select * from emp where id=\"+eid);  if (rs != null) {   rs.next();   String name = rs.getString(\"name\"); %>  Employee Name: <%= name %>",
+    "detection_type": "ml",
+    "rule_pattern": null,
+    "label": "MALICIOUS (ML)",
+    "probability": 0.999999874620163
   }
 ]

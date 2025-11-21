@@ -32,7 +32,8 @@ FILES = {
     "SQLCollection.txt": "SQL",
     "XSSCollection.txt": "XSS",
     "ShellCollection.txt": "SHELL",
-    "non-maliciousCollection.txt": "LEGAL"     # non-maliciousCollection.txt có cấu trúc CSV-like: id,payload,is_malicious,injection_type
+    "non-maliciousCollection.txt": "LEGAL",     # non-maliciousCollection.txt có cấu trúc CSV-like: id,payload,is_malicious,injection_type
+    "access_log.txt": "MALICIOUS",  # access_log.txt: mỗi dòng là một payload tấn công (label=1)
 }
 
 def read_lines_preserve_whitespace(path):
