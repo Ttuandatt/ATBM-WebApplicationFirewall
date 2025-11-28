@@ -108,6 +108,7 @@
         <div class="button-group">
             <button type="submit">Test</button>
             <button type="button" onclick="window.location.href='/retrain'">Retrain</button>
+            <button type="button" onclick="window.location.href='/api/rules/'">Manage Rules</button>
         </div>
     </form>
 </div>
@@ -134,11 +135,11 @@
 {% if result and result.is_malicious %}
 <div id="malicious-popup" class="popup">
     <div class="popup-content">
-        <h2>Request bị chặn!</h2>
-        <p><strong>Loại:</strong> {{ result.label }}</p>
+        <h2>Request is blocked!</h2>
+        <p><strong>Type:</strong> {{ result.label }}</p>
         <p><strong>Payload:</strong> {{ result.payload }}</p>
-        <p><strong>Xác suất:</strong> {{ "%.4f"|format(result.probability) }}</p>
-        <button onclick="closePopup()">Đóng</button>
+        <p><strong>Probability:</strong> {{ "%.4f"|format(result.probability) }}</p>
+        <button onclick="closePopup()">Close</button>
     </div>
 </div>
 {% endif %}

@@ -1,0 +1,24 @@
+{
+  "version": "1.1",
+  "last_updated": "2025-11-28T18:19:58.812998",
+  "rules": [
+    {
+      "pattern": "hello",
+      "name": "test12345",
+      "source": "custom",
+      "attack_type": "MANUAL",
+      "severity": "medium",
+      "description": "Test Add rule function",
+      "created_at": "2025-11-28T17:39:11.494699"
+    },
+    {
+      "pattern": "hi",
+      "name": "test9999",
+      "source": "custom",
+      "attack_type": "MANUAL",
+      "severity": "medium",
+      "description": "Test Add new rule function",
+      "created_at": "2025-11-28T18:19:58.812989"
+    }
+  ]
+}

@@ -32,3 +32,34 @@ python FlaskSimpleTest.py
 12/11/2025 (tuandat):
 Demo:
 1. XSS Payload:
+
+4. RuleManagerAPI.py - Management API (Bonus)
+Các endpoint để quản lý rules:
+GET /api/rules/ - Lấy tất cả rules
+GET /api/rules/stats - Thống kê
+GET /api/rules/search - Tìm kiếm
+POST /api/rules/add - Thêm rule thủ công
+DELETE /api/rules/delete - Xóa rule
+POST /api/rules/reload - Hot-reload
+GET /api/rules/export - Export rules
+POST /api/rules/import - Import rules
+# Xem tất cả rules
+curl http://localhost:5000/api/rules/
+
+# Thống kê
+curl http://localhost:5000/api/rules/stats
+
+# Tìm kiếm rules XSS
+curl "http://localhost:5000/api/rules/search?type=XSS"
+
+# Thêm rule mới
+curl -X POST http://localhost:5000/api/rules/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pattern": "\\bDROP\\s+TABLE\\b",
+    "name": "SQLI_DROP_TABLE",
+    "attack_type": "SQLi"
+  }'
+
+# Reload rules
+curl -X POST http://localhost:5000/api/rules/reload

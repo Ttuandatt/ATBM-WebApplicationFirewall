@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adaptive WAF - Rule Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rule-dashboard.css') }}">
+    <style>
+        /* Toast - IMPROVED */
+        .toast {
+            visibility: hidden;
+            min-width: 300px;
+            margin-left: -150px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 18px 20px;
+            position: fixed;
+            z-index: 99999;
+            left: 50%;
+            bottom: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s ease, bottom 0.3s ease, visibility 0.3s;
+        }
+        .toast.show {
+            visibility: visible !important;
+            opacity: 1 !important;
+            bottom: 50px !important;
+        }
+        .toast.success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        .toast.error {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+        }
+
+        /* Back to home link - FIXED COLOR */
+        .back-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+
+            color: white; /* Đã set thành màu trắng */
+
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+        .back-home:hover {
+            color: #ddd; /* Khi di chuột vào sẽ chuyển sang màu xám nhạt */
+        }
+        .back-home::before {
+            content: "←";
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<a href="/" class="back-home">Back to Home Page</a>
+
+<header>Adaptive WAF - Rule Management Dashboard</header>
+
+<div class="container">
+    <div class="controls">
+        <button id="btn-add">Add Rule</button>
+        <button id="btn-import">Import Rules</button>
+        <button id="btn-export">Export Rules</button>
+        <button id="btn-reload">Reload Rules</button>
+    </div>
+
+    <div class="search">
+        <input type="text" id="search-keyword" placeholder="Search by name/pattern/description">
+        <select id="filter-attack-type">
+            <option value="">All Types</option>
+            <option value="XSS">XSS</option>
+            <option value="SQLi">SQLi</option>
+            <option value="CMDi">CMDi</option>
+            <option value="PathTraversal">PathTraversal</option>
+        </select>
+        <button id="btn-search">Search</button>
+    </div>
+
+    <table id="rules-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Pattern</th>
+                <th>Attack Type</th>
+                <th>Source</th>
+                <th>Severity</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Add / Edit Rule</div>
+        <div class="modal-body">
+            <label>Name:</label>
+            <input type="text" id="rule-name">
+            <label>Pattern:</label>
+            <input type="text" id="rule-pattern">
+            <label>Source:</label>
+            <input type="text" id="rule-source" value="custom">
+            <label>Attack Type:</label>
+            <select id="rule-attack-type">
+                <option value="XSS">XSS</option>
+                <option value="SQLi">SQLi</option>
+                <option value="CMDi">CMDi</option>
+                <option value="PathTraversal">PathTraversal</option>
+                <option value="MANUAL">MANUAL</option>
+            </select>
+            <label>Severity:</label>
+            <select id="rule-severity">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <label>Description:</label>
+            <textarea id="rule-description"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button id="modal-cancel">Cancel</button>
+            <button id="modal-save">Save</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="{{ url_for('static', filename='js/rule_dashboard.js') }}"></script>
+</body>
+</html>
